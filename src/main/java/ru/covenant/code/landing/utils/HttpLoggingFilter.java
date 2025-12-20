@@ -19,6 +19,8 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
 
+    private static final String LOG_TEMPLATE = "HTTP {} {} -> {} ({} ms)";
+
     private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
     private static final String CORRELATION_ID_MDC_KEY = "correlationId";
 
@@ -31,19 +33,25 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
     );
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) {
 
-        String url = request.getRequestURI();
+        try {
+            String url = request.getRequestURI();
 
-        if (isStaticResource(url)) {
-            filterChain.doFilter(request, response);
-            return;
+            if (isStaticResource(url)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            executeWithLogging(request, response, filterChain, url);
+        } catch (IOException | ServletException e) {
+            throw new RuntimeException(e);
         }
-
-        executeWithLogging(request, response, filterChain, url);
     }
 
-    private void executeWithLogging(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String url) throws IOException, ServletException {
+    private void executeWithLogging(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String url) {
 
         Long start = System.currentTimeMillis();
 
@@ -51,6 +59,8 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
 
         try {
             filterChain.doFilter(request, response);
+        } catch (IOException | ServletException e) {
+            throw new RuntimeException(e);
         } finally {
             Long duration = System.currentTimeMillis() - start;
 
@@ -66,24 +76,15 @@ public class HttpLoggingFilter extends OncePerRequestFilter {
 
     private void logRequest(HttpServletRequest request, String url, HttpServletResponse response, Long duration) {
         int status = response.getStatus();
+
         if (!shouldLog(status)) {
             return;
         }
 
         if (status >= 500) {
-            log.error("HTTP {} {} -> {} ({} ms)",
-                    request.getMethod(),
-                    url,
-                    status,
-                    duration
-            );
+            log.error(LOG_TEMPLATE, request.getMethod(), url, status, duration);
         } else {
-            log.warn("HTTP {} {} -> {} ({} ms)",
-                    request.getMethod(),
-                    url,
-                    status,
-                    duration
-            );
+            log.warn(LOG_TEMPLATE, request.getMethod(), url, status, duration);
         }
     }
 
