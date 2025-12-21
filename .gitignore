@@ -34,3 +34,4 @@ build/
 
 ### Credential ###
 *.env
+/logs/**
