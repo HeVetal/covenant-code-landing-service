@@ -17,90 +17,29 @@ import java.util.UUID;
 
 public class HttpLoggingFilter extends OncePerRequestFilter {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpLoggingFilter.class);
-
-    private static final String LOG_TEMPLATE = "HTTP {} {} -> {} ({} ms)";
-
-    private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
-    private static final String CORRELATION_ID_MDC_KEY = "correlationId";
-
-    private static final Set<String> STATIC_RESOURCES_PREFIXES = Set.of(
-            "/css",
-            "/js",
-            "/images",
-            "/static",
-            "/favicon.ico"
-    );
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) {
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        try {
-            String url = request.getRequestURI();
+        String url = request.getRequestURI();
 
-            if (isStaticResource(url)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            executeWithLogging(request, response, filterChain, url);
-        } catch (IOException | ServletException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void executeWithLogging(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, String url) {
-
-        Long start = System.currentTimeMillis();
-
-        initCorrelationContext(request, response);
-
-        try {
+        if (HttpLoggingUtils.isStaticResource(url)) {
             filterChain.doFilter(request, response);
-        } catch (IOException | ServletException e) {
-            throw new RuntimeException(e);
-        } finally {
-            Long duration = System.currentTimeMillis() - start;
-
-            logRequest(request, url, response, duration);
-
-            MDC.clear();
-        }
-    }
-
-    private boolean shouldLog(int status) {
-        return status >= 400;
-    }
-
-    private void logRequest(HttpServletRequest request, String url, HttpServletResponse response, Long duration) {
-        int status = response.getStatus();
-
-        if (!shouldLog(status)) {
             return;
         }
 
-        if (status >= 500) {
-            log.error(LOG_TEMPLATE, request.getMethod(), url, status, duration);
-        } else {
-            log.warn(LOG_TEMPLATE, request.getMethod(), url, status, duration);
+        Long start = System.currentTimeMillis();
+
+        HttpLoggingUtils.initCorrelationContext(request, response);
+
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            Long duration = System.currentTimeMillis() - start;
+            HttpLoggingUtils.logRequest(request, response, url, duration);
+            MDC.clear();
         }
-    }
-
-    private static void initCorrelationContext(HttpServletRequest request, HttpServletResponse response) {
-        String correlationId = request.getHeader(CORRELATION_ID_HEADER);
-
-        if (correlationId == null || correlationId.isBlank()) {
-            correlationId = UUID.randomUUID().toString();
-        }
-
-        MDC.put(CORRELATION_ID_MDC_KEY, correlationId);
-        response.setHeader(CORRELATION_ID_HEADER, correlationId);
-    }
-
-    private boolean isStaticResource(String url) {
-        return STATIC_RESOURCES_PREFIXES.stream()
-                .anyMatch(url::startsWith);
     }
 }
