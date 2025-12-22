@@ -1,19 +1,27 @@
-
-* {
+/*HEDER*/
+{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 header {
     background-color: #fff;
     padding: 20px 0;
     border-bottom: 1px solid #eee;
+    flex-shrink: 0;
 }
 
 .header__inner {
@@ -38,47 +46,37 @@ header {
 
 .header__link {
     text-decoration: none;
-    color: #f7f7fa;
+    color: #050505;
     font-size: 16px;
 }
 
 .header__link:hover {
-    color: #0077cc;
+    color: #f4f4f5;
 }
 
 .header__link--button {
-    background-color: #0077cc;
-    color: white;
+    background-color: #050505;
+    color: #faf7f7;
     padding: 10px 20px;
     border-radius: 4px;
 }
 
 .header__link--button:hover {
-    background-color: #005fa3;
+    background-color: #050505;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    padding: 20px;
-}
-
-
-
+/*FOOTER*/
 .footer {
-    background-color: #f6f5f6;
+    background-color: #4c82af;
     color: #050505;
-    padding: 20px;
-    border-radius: 5px;
+    padding: 40px 20px 20px;
+    margin-top: auto;
+    width: 100%;
 }
 
 .footer-column {
-    margin-bottom: 20px;
+    max-width: 1200px;
+    margin: 0 auto 20px;
 }
 
 .footer-column h3 {
@@ -101,7 +99,7 @@ body {
 
 .links a {
     display: block;
-    color: white;
+    color: #050505;
     text-decoration: none;
     margin-bottom: 5px;
 }
@@ -112,12 +110,12 @@ body {
 
 .footer-copyright {
     text-align: center;
-    margin-top: 20px;
-    padding-top: 15px;
+    margin-top: 40px;
+    padding-top: 20px;
     border-top: 1px solid #555;
-    color: #aaa;
+    color: #050505;
     font-size: 14px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
 }
-
-
-
