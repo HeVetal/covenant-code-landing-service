@@ -65,6 +65,67 @@ header {
     background-color: #050505;
 }
 
+/*MAIN*/
+.button-link {
+    display: inline-block; /* Или block */
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    margin-top: 25px;
+    text-decoration: none; /* Убирает подчеркивание */
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.button-link:hover {
+    background-color: #0056b3;
+}
+
+.container {
+    display: grid; /* Включаем CSS Grid */
+    grid-template-columns: repeat(3, 1fr); /* Создаем 3 колонки одинаковой ширины (1fr - одна фракция) */
+    gap: 20px; /* Расстояние между колонками */
+}
+
+.column {
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+    margin: 30px;
+    border: 2px solid #ffffff
+}
+
+.hero-section {
+    border: 2px solid #ffffff; /* Рамка */
+    padding: 20px; /* Внутренний отступ */
+    margin: 100px; /* Внешний отступ */
+    border-radius: 8px; /* Скругляет углы */
+    text-align: center; /* Центрирование содержимого */
+    background: linear-gradient(to right, #00008B, #ADD8E6); /* фон */
+}
+
+.hero-section h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.hero-section p {
+    color: #7f8c8d;
+    margin-bottom: 15px;
+}
+
+.about-us {
+    /*border: 2px solid #050505; !* Рамка *!*/
+    padding: 20px; /* Внутренний отступ */
+    margin: 30px; /* Внешний отступ */
+    border-radius: 8px; /* Скругляет углы */
+    text-align: center; /* Центрирование содержимого */
+    background: #ffffff;
+}
+
 /*FOOTER*/
 .footer {
     background-color: #4c82af;

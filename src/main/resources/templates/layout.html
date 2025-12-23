@@ -12,14 +12,40 @@
     <div class="header__inner">
         <img src="logo.svg" alt="Logo" class="header__logo">
         <nav class="header__nav">
-            <a href="#about" class="header__link">О нас</a>
+            <a href="#about-us" class="header__link">О нас</a>
             <a href="#apply" class="header__link header__link--button">Отправить заявку</a>
         </nav>
     </div>
 </header>
 
 <main>
-    <div th:replace="${content}"></div>
+    <main class="main">
+        <div class="hero-section">
+            <h2 class="title">Covenant Code</h2>
+            <b class="sub-title">подзаголовок</b><br>
+            <a href="registerForm.html" class="button-link">Зарегестрироваться</a>
+        </div>
+
+        <div class="about-us" id="about-us">
+            <h2>О нас — текстовый блок</h2>
+        </div>
+
+
+        <div class="container">
+            <div class="column">
+                <h3>Преимущество 1</h3>
+                <p>Содержимое первой колонки...</p>
+            </div>
+            <div class="column">
+                <h3>Преимущество 2</h3>
+                <p>Содержимое второй колонки...</p>
+            </div>
+            <div class="column">
+                <h3>Преимущество 3</h3>
+                <p>Содержимое третьей колонки...</p>
+            </div>
+        </div>
+    </main>
 </main>
 
 <footer class="footer">
