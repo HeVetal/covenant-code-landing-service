@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(content)">
 <head>
     <meta charset="UTF-8">
     <title>CovenantCodeLanding</title>
@@ -15,13 +17,18 @@
         </nav>
     </div>
 </header>
+
+<main>
+    <div th:replace="${content}"></div>
+</main>
+
 <footer class="footer">
     <div class="footer-column">
         <h3>Контакты</h3>
         <div class="contact-info">
-            <div class="contact-line"> Адрес: </div>
-            <div class="contact-line"> Телефон: </div>
-            <div class="contact-line"> Email: </div>
+            <div class="contact-line"> Адрес:</div>
+            <div class="contact-line"> Телефон:</div>
+            <div class="contact-line"> Email:</div>
         </div>
     </div>
     <div class="footer-column">
