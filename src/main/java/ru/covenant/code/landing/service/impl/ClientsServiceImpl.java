@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
+import ru.covenant.code.landing.dto.response.ClientsCreateRsDto;
 import ru.covenant.code.landing.entity.Clients;
 import ru.covenant.code.landing.entity.enumerated.Status;
 import ru.covenant.code.landing.exceptions.ClientsNotFoundException;
@@ -37,7 +38,7 @@ public class ClientsServiceImpl implements ClientsService {
         Clients client;
         try {
             client = clientsRepository.findById(id).orElseThrow(() -> new ClientsNotFoundException());
-        }catch (ClientsNotFoundException e){
+        } catch (ClientsNotFoundException e) {
             log.error("Заявка не найдена");
             throw e;
         }
@@ -45,8 +46,8 @@ public class ClientsServiceImpl implements ClientsService {
     }
 
     @Override
-    public Clients create(ClientsRqDto request) {
-        if(request == null){
+    public ClientsCreateRsDto create(ClientsRqDto request) {
+        if (request == null) {
             log.error("входящий параметр = null");
             throw new IllegalArgumentException("request = null");
         }
@@ -54,11 +55,15 @@ public class ClientsServiceImpl implements ClientsService {
         Clients saveClient;
         try {
             saveClient = clientsRepository.save(clients);
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("Ошибка при сохранении клиента");
             throw new PersistenceException();
         }
-        return saveClient;
+        ClientsCreateRsDto clientsCreateRsDto = new ClientsCreateRsDto();
+        clientsCreateRsDto.setId(saveClient.getId().toString());
+        clientsCreateRsDto.setStatus(saveClient.getStatus().toString());
+
+        return clientsCreateRsDto;
     }
 
     @Override
@@ -68,7 +73,7 @@ public class ClientsServiceImpl implements ClientsService {
 
     @Override
     public Clients updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
-        if(clientsStatusRqDto == null){
+        if (clientsStatusRqDto == null) {
             throw new IllegalArgumentException("Клиент статус dto = null");
         }
         uuidIsNull(id);

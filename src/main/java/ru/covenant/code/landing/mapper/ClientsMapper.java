@@ -17,6 +17,7 @@ public interface ClientsMapper {
     @Mapping(ignore = true, target = "createdAt")
     @Mapping(ignore = true, target = "updatedAt")
     Clients mapToClients(ClientsRqDto rq);
+
     ClientsRqDto mapToClientsRqDto(Clients clients);
 
     @Mapping(ignore = true, target = "id")
@@ -24,6 +25,7 @@ public interface ClientsMapper {
     @Mapping(ignore = true, target = "createdAt")
     @Mapping(ignore = true, target = "updatedAt")
     Clients mapToClients(ClientsRsDto clientsRsDto);
+
     ClientsRsDto mapToClientsRsDto(Clients clients);
 
     @Mapping(source = "status", target = "status")
@@ -35,5 +37,6 @@ public interface ClientsMapper {
     @Mapping(ignore = true, target = "createdAt")
     @Mapping(ignore = true, target = "updatedAt")
     Clients mapToClients(ClientsStatusRqDto clientsStatusRqDto);
+
     ClientsStatusRqDto mapToClientsStatusRqDto(Clients clients);
 }
