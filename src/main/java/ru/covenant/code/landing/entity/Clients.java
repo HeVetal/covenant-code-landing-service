@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 import ru.covenant.code.landing.entity.enumerated.Status;
 
 import java.time.OffsetDateTime;
@@ -23,7 +22,7 @@ public class Clients {
     private String name;
     private String phone;
     private String email;
-    private String massage;
+    private String message;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR DEFAULT 'NEW'")
