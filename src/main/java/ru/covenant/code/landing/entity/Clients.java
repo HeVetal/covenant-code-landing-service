@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import ru.covenant.code.landing.entity.enumerated.Status;
 
 import java.time.OffsetDateTime;
@@ -17,7 +19,9 @@ import java.util.UUID;
 public class Clients {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.CHAR) // Хранить UUID как CHAR(36)
+    @Column(length = 36, updatable = false, nullable = false)
     private UUID id;
     private String name;
     private String phone;
