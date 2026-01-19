@@ -7,8 +7,8 @@ spring:
       on-profile: dev  # Этот блок активен только при профиле "dev"
 
   datasource:
-    driver-class-name: org.h2.Driver  # Класс драйвера для подключения к базе H2
     url: jdbc:h2:mem:landing-db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver  # Класс драйвера для подключения к базе H2
     # URL базы данных H2 в памяти
     # MODE=PostgreSQL — делает поведение H2 максимально похожим на Postgres
     # DB_CLOSE_DELAY=-1 — база не удаляется после закрытия соединения
@@ -23,8 +23,10 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update  # Автоматическое обновление структуры базы по сущностям JPA
-    show-sql: false  # Не выводить SQL-запросы в консоль (можно включить для отладки)
+      ddl-auto: create  # Автоматическое обновление структуры базы по сущностям JPA
+    show-sql: true  # Не выводить SQL-запросы в консоль (можно включить для отладки)
+    properties:
+      hibernate.format_sql: true
 
 server:
   port: 8080  # Порт, на котором запускается приложение
