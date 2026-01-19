@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
+import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.dto.response.ClientsRsDto;
 import ru.covenant.code.landing.entity.Clients;
 
@@ -39,4 +40,6 @@ public interface ClientsMapper {
     Clients mapToClients(ClientsStatusRqDto clientsStatusRqDto);
 
     ClientsStatusRqDto mapToClientsStatusRqDto(Clients clients);
+
+    ClientsAdminRsDto mapToClientsAdminRsDto(Clients clients);
 }
