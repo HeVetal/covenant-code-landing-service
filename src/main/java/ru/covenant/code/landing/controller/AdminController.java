@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.service.ClientsService;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,5 +22,10 @@ public class AdminController {
             @RequestBody ClientsAdminRsDto clientsAdminRsDto) {
 
         return ResponseEntity.ok(clientsService.update(id, clientsAdminRsDto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClientsAdminRsDto>> getAllClients() {
+        return ResponseEntity.ok(clientsService.getAllAdminClients());
     }
 }
