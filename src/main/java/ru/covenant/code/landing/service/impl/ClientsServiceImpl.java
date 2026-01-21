@@ -105,6 +105,7 @@ public class ClientsServiceImpl implements ClientsService {
         return clientsMapper.mapToClientsDetailsRs(saved);
     }
 
+
     @Override
     public void delete(UUID id) {
         uuidIsNull(id);
