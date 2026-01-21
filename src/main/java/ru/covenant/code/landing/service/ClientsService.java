@@ -2,6 +2,7 @@ package ru.covenant.code.landing.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
@@ -21,7 +22,7 @@ public interface ClientsService {
 
     List<Clients> getAll();
 
-    Clients updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto);
+    ClientsDetailsRs updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto);
 
     void delete(UUID id);
 
