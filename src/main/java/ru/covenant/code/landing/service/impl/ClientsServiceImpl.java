@@ -3,7 +3,7 @@ package ru.covenant.code.landing.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
+import ru.covenant.code.landing.dto.response.ClientsDetailsRsDto;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
@@ -75,19 +75,22 @@ public class ClientsServiceImpl implements ClientsService {
     }
 
     @Override
-    public ClientsDetailsRs updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
+    public ClientsDetailsRsDto updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
         if (clientsStatusRqDto == null) {
             throw new IllegalArgumentException("Клиент статус dto = null");
         }
         uuidIsNull(id);
+
         Status clientStatus = clientStatus(clientsStatusRqDto);
         statusIsNull(clientStatus);
-        boolean isEquals = Arrays.stream(Status.values()).anyMatch(status -> status.name().equals(clientStatus.name()));
-        if (!isEquals) {
+        boolean isValidStatus = Arrays.stream(Status.values())
+                .anyMatch(status -> status.name().equals(clientStatus.name()));
+
+        if (!isValidStatus) {
             log.error("Некорректный статус");
             throw new InvalidClientsStatusException();
-
         }
+
         Clients client = getById(id);
 
         if (client.getStatus() != Status.NEW) {
@@ -99,7 +102,6 @@ public class ClientsServiceImpl implements ClientsService {
             log.error("Некорректная смена статуса: разрешено только NEW -> PROCESSED. Запрошен: {}", clientStatus);
             throw new InvalidClientsStatusException();
         }
-
         client.setStatus(clientStatus);
         Clients saved = clientsRepository.save(client);
         return clientsMapper.mapToClientsDetailsRs(saved);
@@ -120,11 +122,6 @@ public class ClientsServiceImpl implements ClientsService {
                 .toList();
     }
 
-    @Override
-    public List<ClientsListRsDto> getAllForAdmin() {
-        List<Clients> allClients = clientsRepository.findAll();
-        return clientsMapper.mapToClientsListRsDto(allClients);
-    }
 
     public void uuidIsNull(UUID id) {
         if (id == null) {
