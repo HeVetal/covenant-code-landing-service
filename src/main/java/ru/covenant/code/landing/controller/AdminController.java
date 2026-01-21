@@ -2,6 +2,8 @@ package ru.covenant.code.landing.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
+import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.service.ClientsService;
 
@@ -17,11 +19,12 @@ public class AdminController {
         this.clientsService = clientsService;
     }
     @PutMapping("/{id}/status")
-    public ResponseEntity<ClientsAdminRsDto> updateClient(
+    public ResponseEntity<ClientsDetailsRs> updateClient(
             @PathVariable("id") UUID id,
-            @RequestBody ClientsAdminRsDto clientsAdminRsDto) {
+            @RequestBody ClientsStatusRqDto clientsStatusRqDto) {
 
-        return ResponseEntity.ok(clientsService.update(id, clientsAdminRsDto));
+        ClientsDetailsRs clientsDetailsRs = clientsService.updateStatus(id, clientsStatusRqDto);
+        return ResponseEntity.ok(clientsDetailsRs);
     }
 
     @GetMapping
