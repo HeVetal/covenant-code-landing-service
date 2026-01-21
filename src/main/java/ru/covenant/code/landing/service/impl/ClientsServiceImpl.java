@@ -3,6 +3,7 @@ package ru.covenant.code.landing.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
@@ -73,7 +74,7 @@ public class ClientsServiceImpl implements ClientsService {
     }
 
     @Override
-    public Clients updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
+    public ClientsDetailsRs updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
         if (clientsStatusRqDto == null) {
             throw new IllegalArgumentException("Клиент статус dto = null");
         }
@@ -87,8 +88,20 @@ public class ClientsServiceImpl implements ClientsService {
 
         }
         Clients client = getById(id);
+
+        if (client.getStatus() != Status.NEW) {
+            log.error("Нельзя изменить статус: заявка уже не NEW. Текущий статус: {}", client.getStatus());
+            throw new InvalidClientsStatusException();
+        }
+
+        if (clientStatus != Status.PROCESSED) {
+            log.error("Некорректная смена статуса: разрешено только NEW -> PROCESSED. Запрошен: {}", clientStatus);
+            throw new InvalidClientsStatusException();
+        }
+
         client.setStatus(clientStatus);
-        return clientsRepository.save(client);
+        Clients saved = clientsRepository.save(client);
+        return clientsMapper.mapToClientsDetailsRs(saved);
     }
 
     @Override
@@ -121,5 +134,11 @@ public class ClientsServiceImpl implements ClientsService {
 
     public Status clientStatus(ClientsStatusRqDto clientsStatusRqDto) {
         return clientsStatusRqDto.getStatus();
+    }
+
+    @Override
+    public ClientsAdminRsDto getAdminClientById(UUID id) {
+        Clients client = getById(id);
+        return clientsMapper.mapToClientsAdminRsDto(client);
     }
 }

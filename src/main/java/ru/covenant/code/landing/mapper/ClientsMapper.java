@@ -2,6 +2,7 @@ package ru.covenant.code.landing.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
@@ -42,4 +43,6 @@ public interface ClientsMapper {
     ClientsStatusRqDto mapToClientsStatusRqDto(Clients clients);
 
     ClientsAdminRsDto mapToClientsAdminRsDto(Clients clients);
+
+    ClientsDetailsRs mapToClientsDetailsRs(Clients clients);
 }
