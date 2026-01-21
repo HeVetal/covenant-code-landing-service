@@ -1,5 +1,6 @@
 package ru.covenant.code.landing.service;
 
+import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
@@ -24,5 +25,6 @@ public interface ClientsService {
 
     List<ClientsAdminRsDto> getAllAdminClients();
 
+    ClientsAdminRsDto getAdminClientById(UUID id);
     public abstract List<ClientsListRsDto> getAllForAdmin();
 }

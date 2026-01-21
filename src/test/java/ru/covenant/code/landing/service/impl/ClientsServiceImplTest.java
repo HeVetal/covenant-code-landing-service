@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.entity.Clients;
@@ -152,7 +153,7 @@ class ClientsServiceImplTest {
         when(clientsRepository.save(any(Clients.class)))
                 .thenReturn(testStatusClients);
 
-        Clients resultClient = clientsService.updateStatus(id, dto);
+        ClientsDetailsRs resultClient = clientsService.updateStatus(id, dto);
 
         assertEquals(Status.PROCESSED, resultClient.getStatus());
 
