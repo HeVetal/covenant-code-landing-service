@@ -19,11 +19,12 @@ public interface ClientsService {
 
     List<Clients> getAll();
 
-    ClientsDetailsRs updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto);
+    Clients updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto);
 
     void delete(UUID id);
 
     List<ClientsAdminRsDto> getAllAdminClients();
 
+    ClientsAdminRsDto getAdminClientById(UUID id);
     public abstract List<ClientsListRsDto> getAllForAdmin();
 }
