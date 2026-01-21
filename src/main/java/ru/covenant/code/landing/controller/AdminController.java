@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
+import ru.covenant.code.landing.entity.Clients;
 import ru.covenant.code.landing.service.ClientsService;
 
 import java.util.List;
@@ -36,5 +37,11 @@ public class AdminController {
     public ResponseEntity<Void> deleteClient(@PathVariable("id") UUID id) {
         clientsService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+//    @PreAuthorize("hasRole('ADMIN')")
+    public List<Clients> getAll() {
+        return clientsService.getAll();
     }
 }
