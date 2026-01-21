@@ -31,4 +31,10 @@ public class AdminController {
     public ResponseEntity<List<ClientsAdminRsDto>> getAllClients() {
         return ResponseEntity.ok(clientsService.getAllAdminClients());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteClient(@PathVariable("id") UUID id) {
+        clientsService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
