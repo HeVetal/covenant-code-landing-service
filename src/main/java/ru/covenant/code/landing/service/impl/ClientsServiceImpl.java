@@ -8,6 +8,7 @@ import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.dto.response.ClientsCreateRsDto;
+import ru.covenant.code.landing.dto.response.ClientsListRsDto;
 import ru.covenant.code.landing.entity.Clients;
 import ru.covenant.code.landing.entity.enumerated.Status;
 import ru.covenant.code.landing.exceptions.ClientsNotFoundException;
@@ -116,6 +117,12 @@ public class ClientsServiceImpl implements ClientsService {
         return clientsRepository.findAll().stream()
                 .map(clientsMapper::mapToClientsAdminRsDto)
                 .toList();
+    }
+
+    @Override
+    public List<ClientsListRsDto> getAllForAdmin() {
+        List<Clients> allClients = clientsRepository.findAll();
+        return clientsMapper.mapToClientsListRsDto(allClients);
     }
 
     public void uuidIsNull(UUID id) {

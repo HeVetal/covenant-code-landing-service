@@ -5,7 +5,9 @@ import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.dto.response.ClientsCreateRsDto;
+import ru.covenant.code.landing.dto.response.ClientsListRsDto;
 import ru.covenant.code.landing.entity.Clients;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -17,11 +19,12 @@ public interface ClientsService {
 
     List<Clients> getAll();
 
-    ClientsDetailsRs updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto);
+    Clients updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto);
 
     void delete(UUID id);
 
     List<ClientsAdminRsDto> getAllAdminClients();
 
     ClientsAdminRsDto getAdminClientById(UUID id);
+    public abstract List<ClientsListRsDto> getAllForAdmin();
 }
