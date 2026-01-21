@@ -1,10 +1,9 @@
 package ru.covenant.code.landing.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.covenant.code.landing.dto.request.ClientsDetailsRs;
+import ru.covenant.code.landing.dto.response.ClientsDetailsRsDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.entity.Clients;
@@ -14,7 +13,7 @@ import ru.covenant.code.landing.service.ClientsService;
 import java.util.List;
 import java.util.UUID;
 
-@Controller
+@RestController
 @RequestMapping("/admin/clients")
 public class AdminController {
 
@@ -24,15 +23,13 @@ public class AdminController {
         this.clientsService = clientsService;
     }
 
-
-    @ResponseBody
     @PutMapping("/{id}/status")
-    public ResponseEntity<ClientsDetailsRs> updateClient(
+    public ResponseEntity<ClientsDetailsRsDto> updateStatusClient(
             @PathVariable("id") UUID id,
             @RequestBody ClientsStatusRqDto clientsStatusRqDto) {
 
-        ClientsDetailsRs clientsDetailsRs = clientsService.updateStatus(id, clientsStatusRqDto);
-        return ResponseEntity.ok(clientsDetailsRs);
+        ClientsDetailsRsDto clientsDetailsRsDto = clientsService.updateStatus(id, clientsStatusRqDto);
+        return ResponseEntity.ok(clientsDetailsRsDto);
     }
 
     @GetMapping
@@ -56,24 +53,18 @@ public class AdminController {
     }
 
 
-    @ResponseBody
-    @GetMapping("/api")
+    @GetMapping
     public ResponseEntity<List<ClientsAdminRsDto>> getAllClients() {
         return ResponseEntity.ok(clientsService.getAllAdminClients());
     }
 
-    @ResponseBody
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClient(@PathVariable("id") UUID id) {
         clientsService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-//    @PreAuthorize("hasRole('ADMIN')")
-    public List<Clients> getAll() {
-        return clientsService.getAll();
-    @ResponseBody
     @GetMapping("/{id}")
     public ResponseEntity<ClientsAdminRsDto> getClientById(@PathVariable UUID id) {
         return ResponseEntity.ok(clientsService.getAdminClientById(id));
