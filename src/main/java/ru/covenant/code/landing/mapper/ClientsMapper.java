@@ -2,11 +2,15 @@ package ru.covenant.code.landing.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.covenant.code.landing.dto.response.ClientsDetailsRsDto;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
+import ru.covenant.code.landing.dto.response.ClientsListRsDto;
 import ru.covenant.code.landing.dto.response.ClientsRsDto;
 import ru.covenant.code.landing.entity.Clients;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ClientsMapper {
@@ -42,4 +46,13 @@ public interface ClientsMapper {
     ClientsStatusRqDto mapToClientsStatusRqDto(Clients clients);
 
     ClientsAdminRsDto mapToClientsAdminRsDto(Clients clients);
+
+    ClientsDetailsRsDto mapToClientsDetailsRs(Clients clients);
+
+    /*@Mapping(source = "email",target = "email")
+    @Mapping(source = "message", target = "message")*/
+    Clients mapToDetailsRsToClient(ClientsDetailsRsDto dto);
+
+    ClientsDetailsRsDto mapToClientToDetailsRs(Clients entity);
+
 }

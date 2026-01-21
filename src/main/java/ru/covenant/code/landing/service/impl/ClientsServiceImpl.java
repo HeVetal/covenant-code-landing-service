@@ -3,10 +3,12 @@ package ru.covenant.code.landing.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.covenant.code.landing.dto.response.ClientsDetailsRsDto;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
 import ru.covenant.code.landing.dto.response.ClientsCreateRsDto;
+import ru.covenant.code.landing.dto.response.ClientsListRsDto;
 import ru.covenant.code.landing.entity.Clients;
 import ru.covenant.code.landing.entity.enumerated.Status;
 import ru.covenant.code.landing.exceptions.ClientsNotFoundException;
@@ -73,23 +75,38 @@ public class ClientsServiceImpl implements ClientsService {
     }
 
     @Override
-    public Clients updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
+    public ClientsDetailsRsDto updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
         if (clientsStatusRqDto == null) {
             throw new IllegalArgumentException("Клиент статус dto = null");
         }
         uuidIsNull(id);
+
         Status clientStatus = clientStatus(clientsStatusRqDto);
         statusIsNull(clientStatus);
-        boolean isEquals = Arrays.stream(Status.values()).anyMatch(status -> status.name().equals(clientStatus.name()));
-        if (!isEquals) {
+        boolean isValidStatus = Arrays.stream(Status.values())
+                .anyMatch(status -> status.name().equals(clientStatus.name()));
+
+        if (!isValidStatus) {
             log.error("Некорректный статус");
             throw new InvalidClientsStatusException();
-
         }
+
         Clients client = getById(id);
+
+        if (client.getStatus() != Status.NEW) {
+            log.error("Нельзя изменить статус: заявка уже не NEW. Текущий статус: {}", client.getStatus());
+            throw new InvalidClientsStatusException();
+        }
+
+        if (clientStatus != Status.PROCESSED) {
+            log.error("Некорректная смена статуса: разрешено только NEW -> PROCESSED. Запрошен: {}", clientStatus);
+            throw new InvalidClientsStatusException();
+        }
         client.setStatus(clientStatus);
-        return clientsRepository.save(client);
+        Clients saved = clientsRepository.save(client);
+        return clientsMapper.mapToClientsDetailsRs(saved);
     }
+
 
     @Override
     public void delete(UUID id) {
@@ -104,6 +121,7 @@ public class ClientsServiceImpl implements ClientsService {
                 .map(clientsMapper::mapToClientsAdminRsDto)
                 .toList();
     }
+
 
     public void uuidIsNull(UUID id) {
         if (id == null) {
@@ -121,5 +139,11 @@ public class ClientsServiceImpl implements ClientsService {
 
     public Status clientStatus(ClientsStatusRqDto clientsStatusRqDto) {
         return clientsStatusRqDto.getStatus();
+    }
+
+    @Override
+    public ClientsAdminRsDto getAdminClientById(UUID id) {
+        Clients client = getById(id);
+        return clientsMapper.mapToClientsAdminRsDto(client);
     }
 }
