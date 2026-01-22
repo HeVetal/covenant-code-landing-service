@@ -1,5 +1,6 @@
 package ru.covenant.code.landing.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/admin/clients")
+@RequestMapping(value = "/admin/clients", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminController {
 
     private final ClientsService clientsService;
@@ -30,26 +31,6 @@ public class AdminController {
 
         ClientsDetailsRsDto clientsDetailsRsDto = clientsService.updateStatus(id, clientsStatusRqDto);
         return ResponseEntity.ok(clientsDetailsRsDto);
-    }
-
-    @GetMapping
-    public String clientsPage(Model model) {
-        model.addAttribute("clients", clientsService.getAllAdminClients());
-        return "admin/clients";
-    }
-
-    @PostMapping("/{id}/process")
-    public String processClient(@PathVariable UUID id) {
-        ClientsStatusRqDto clientStatus = new ClientsStatusRqDto();
-        clientStatus.setStatus(Status.PROCESSED);
-        clientsService.updateStatus(id, clientStatus);
-        return "redirect:/admin/clients";
-    }
-
-    @PostMapping("/{id}/delete")
-    public String deleteClientFromPage(@PathVariable UUID id) {
-        clientsService.delete(id);
-        return "redirect:/admin/clients";
     }
 
 
