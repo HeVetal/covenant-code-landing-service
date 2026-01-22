@@ -2,6 +2,8 @@ spring:
   application:
     name: covenant-code-landing-service  # Имя приложения, используется в логах и метаданных
 
+
+
   config:
     activate:
       on-profile: dev  # Этот блок активен только при профиле "dev"
@@ -27,6 +29,11 @@ spring:
     show-sql: true  # Не выводить SQL-запросы в консоль (можно включить для отладки)
     properties:
       hibernate.format_sql: true
+
+admin:
+  default:
+    username: admin
+    password: admin
 
 server:
   port: 8080  # Порт, на котором запускается приложение
