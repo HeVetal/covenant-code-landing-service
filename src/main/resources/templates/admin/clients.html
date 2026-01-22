@@ -8,8 +8,13 @@
 
 <h2>Список заявок</h2>
 
-<p th:if="${error}" th:text="${error}" style="color:red;"></p>
+<p th:if="${success == 'deleted'}" style="color:green;">
+    ✅ Заявка удалена
+</p>
 
+<p th:if="${error == 'notfound'}" style="color:red;">
+    ❌ Заявка не найдена
+</p>
 
 <table border="1" cellpadding="6" cellspacing="0">
     <thead>
