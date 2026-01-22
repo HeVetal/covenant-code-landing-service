@@ -30,6 +30,13 @@
     Отработано
 </button>
 
+<button
+        id="deleteBtn"
+        type="button"
+        onclick="deleteClient()">
+    Удалить
+</button>
+
 <a th:href="@{/admin/clients}">Назад к списку</a>
 
 
@@ -43,13 +50,34 @@
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ status: 'PROCESSED' })
+            body: JSON.stringify({status:'PROCESSED'})
         })
             .then(response => {
                 if (!response.ok) throw new Error('Ошибка обновления статуса');
                 window.location.href = `/admin/clients/${clientId}?success=processed`;
             })
             .catch(() => alert('Не удалось обновить статус'));
+    }
+
+    function deleteClient() {
+        const clientId = '[[${client.id}]]';
+
+        const ok = confirm('Вы уверены, что хотите удалить заявку?\nЭто действие невозможно отменить.');
+        if (!ok) return;
+
+        fetch(`/admin/clients/${clientId}`, {
+            method: 'DELETE',
+            headers: {'Accept': 'application/json'}
+        })
+            .then(response => {
+                if (response.status === 404) {
+                    window.location.href = '/admin/clients?error=notfound';
+                    return;
+                }
+                if (!response.ok) throw new Error('Ошибка удаления');
+                window.location.href = '/admin/clients?success=deleted';
+            })
+            .catch(() => alert('Не удалось удалить заявку'));
     }
 </script>
 

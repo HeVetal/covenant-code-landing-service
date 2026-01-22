@@ -23,7 +23,11 @@ public class ViewController {
     }
 
     @GetMapping(produces = MediaType.TEXT_HTML_VALUE)
-    public String clientsPage(Model model) {
+    public String clientsPage(Model model,
+                              @RequestParam(required = false) String success,
+                              @RequestParam(required = false) String error) {
+        model.addAttribute("error", error);
+        model.addAttribute("success", success);
         model.addAttribute("clients", clientsService.getAllAdminClients());
         return "admin/clients";
     }
