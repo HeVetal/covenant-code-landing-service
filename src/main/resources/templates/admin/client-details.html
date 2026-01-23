@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Client details</title>
+</head>
+<body>
+
+<h2>Карточка заявки</h2>
+
+<p th:if="${success == 'processed'}" style="color:green;">
+    ✅ Заявка отмечена как PROCESSED
+</p>
+
+<div>
+    <p><b>ID:</b> <span th:text="${client.id}">id</span></p>
+    <p><b>Имя:</b> <span th:text="${client.name}">name</span></p>
+    <p><b>Телефон:</b> <span th:text="${client.phone}">phone</span></p>
+    <p><b>Email:</b> <span th:text="${client.email}">email</span></p>
+    <p><b>Статус:</b> <span th:text="${client.status}">status</span></p>
+    <p><b>Дата:</b> <span th:text="${client.createdAt}">createdAt</span></p>
+</div>
+
+<hr>
+
+<button
+        id="processBtn"
+        th:if="${client.status == 'NEW'}"
+        onclick="processClient()">
+    Отработано
+</button>
+
+<button
+        id="deleteBtn"
+        type="button"
+        onclick="deleteClient()">
+    Удалить
+</button>
+
+<a th:href="@{/admin/clients}">Назад к списку</a>
+
+
+<script th:inline="javascript">
+    function processClient() {
+        const clientId = '[[${client.id}]]';
+
+        fetch(`/admin/clients/${clientId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({status:'PROCESSED'})
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Ошибка обновления статуса');
+                window.location.href = `/admin/clients/${clientId}?success=processed`;
+            })
+            .catch(() => alert('Не удалось обновить статус'));
+    }
+
+    function deleteClient() {
+        const clientId = '[[${client.id}]]';
+
+        const ok = confirm('Вы уверены, что хотите удалить заявку?\nЭто действие невозможно отменить.');
+        if (!ok) return;
+
+        fetch(`/admin/clients/${clientId}`, {
+            method: 'DELETE',
+            headers: {'Accept': 'application/json'}
+        })
+            .then(response => {
+                if (response.status === 404) {
+                    window.location.href = '/admin/clients?error=notfound';
+                    return;
+                }
+                if (!response.ok) throw new Error('Ошибка удаления');
+                window.location.href = '/admin/clients?success=deleted';
+            })
+            .catch(() => alert('Не удалось удалить заявку'));
+    }
+</script>
+
+</body>
+</html>

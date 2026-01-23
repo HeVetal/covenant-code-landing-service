@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::title}, ~{::main})}">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в панель управления - Covenant Code</title>
+
+</head>
+
+<body>
+<main th:fragment="main">
+    <div class="login-section">
+        <h2 class="login-title">
+            <svg th:inline="text" style="width: 24px; height: 24px; margin-right: 10px; vertical-align: middle;"
+                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+            Вход в панель управления
+        </h2>
+
+        <div th:if="${param.error}" class="alert alert-error">
+            Неверное имя пользователя или пароль
+        </div>
+
+        <div th:if="${param.logout}" class="alert alert-success">
+            Вы успешно вышли из системы
+        </div>
+
+        <div th:if="${param.expired}" class="alert alert-error">
+            Сессия истекла. Пожалуйста, войдите снова.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Имя пользователя:</label>
+                <input type="text"
+                       id="username"
+                       name="username"
+                       class="form-control"
+                       placeholder="Введите имя пользователя"
+                       required
+                       autofocus
+                       th:value="${#request.getParameter('username')}">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Введите пароль"
+                       required>
+            </div>
+
+            <div class="remember-me">
+                <input type="checkbox"
+                       id="remember-me"
+                       name="remember-me">
+                <label for="remember-me">Запомнить меня</label>
+            </div>
+
+            <button type="submit" class="btn-login">
+                Войти
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>Только для администраторов системы</p>
+            <p class="admin-note">
+                По вопросам доступа обратитесь к системному администратору
+            </p>
+        </div>
+    </div>
+</main>
+</body>
+</html>

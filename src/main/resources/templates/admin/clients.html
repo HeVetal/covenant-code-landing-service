@@ -8,6 +8,14 @@
 
 <h2>Список заявок</h2>
 
+<p th:if="${success == 'deleted'}" style="color:green;">
+    ✅ Заявка удалена
+</p>
+
+<p th:if="${error == 'notfound'}" style="color:red;">
+    ❌ Заявка не найдена
+</p>
+
 <table border="1" cellpadding="6" cellspacing="0">
     <thead>
     <tr>
@@ -29,18 +37,9 @@
         <td th:text="${c.createdAt}">createdAt</td>
 
         <td>
-            <!-- Открыть: пока просто JSON по /admin/clients/{id} -->
+
             <a th:href="@{/admin/clients/{id}(id=${c.id})}">Открыть</a>
 
-            <!-- Отработано -->
-            <form th:action="@{/admin/clients/{id}/process(id=${c.id})}"
-                  method="post"
-                  style="display:inline;">
-                <button type="submit"
-                        th:disabled="${c.status != 'NEW'}">
-                    Отработано
-                </button>
-            </form>
 
             <!-- Удалить -->
             <form th:action="@{/admin/clients/{id}/delete(id=${c.id})}"
