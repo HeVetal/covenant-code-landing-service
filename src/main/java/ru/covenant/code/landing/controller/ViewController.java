@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.entity.enumerated.Status;
 import ru.covenant.code.landing.exceptions.ClientsNotFoundException;
+import ru.covenant.code.landing.exceptions.InvalidClientsStatusException;
 import ru.covenant.code.landing.service.ClientsService;
 
 import java.util.UUID;
@@ -48,6 +49,25 @@ public class ViewController {
 
         } catch (ClientsNotFoundException e) {
             ra.addFlashAttribute("error", "Заявка не найдена");
+            return "redirect:/admin/clients";
+        }
+    }
+
+    @PostMapping("/{id}/status")
+    public String updateClientStatus(@PathVariable UUID id,
+                                     @RequestParam Status status,
+                                     RedirectAttributes ra) {
+        try {
+            ClientsStatusRqDto statusRqDto = new ClientsStatusRqDto();
+            statusRqDto.setStatus(status);
+
+            clientsService.updateStatus(id, statusRqDto);
+            return "redirect:/admin/clients";
+        } catch (ClientsNotFoundException e) {
+            ra.addFlashAttribute("error", "Заявка не найдена");
+            return "redirect:/admin/clients";
+        } catch (InvalidClientsStatusException e) {
+            ra.addFlashAttribute("error", "Невозможно изменить статус");
             return "redirect:/admin/clients";
         }
     }
