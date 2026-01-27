@@ -1,6 +1,7 @@
 package ru.covenant.code.landing.controller;
 
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +26,7 @@ public class ClientsController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientsCreateRsDto> addClients(@RequestBody ClientsRqDto clientsRq) {
+    public ResponseEntity<ClientsCreateRsDto> addClients(@Valid @RequestBody ClientsRqDto clientsRq) {
         return ResponseEntity.status(HttpStatus.CREATED).body(clientsService.create(clientsRq));
     }
 }
