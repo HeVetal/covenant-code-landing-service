@@ -3,6 +3,7 @@ package ru.covenant.code.landing.controller;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,16 +49,20 @@ public class PublicViewController {
     @PostMapping("/registerForm")
     public String handleRegisterForm(
             @Valid @ModelAttribute("user") ClientsRqDto clientsRqDto,
+            BindingResult bindingResult,
             RedirectAttributes redirectAttributes
     ) {
+        if (bindingResult.hasErrors()) {
+            return "registerForm";
+        }
+
         try {
             clientsService.create(clientsRqDto);
-            redirectAttributes.addFlashAttribute("message", "Регистрация успешно завершена!");
-            redirectAttributes.addFlashAttribute("user", new ClientsRqDto());
+            return "redirect:/v1/success";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Ошибка при регистрации: " + e.getMessage());
             redirectAttributes.addFlashAttribute("user", clientsRqDto);
+            return "redirect:/v1/registerForm";
         }
-        return "redirect:/v1/layout";
     }
 }
