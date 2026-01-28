@@ -1,9 +1,9 @@
 package ru.covenant.code.landing.dto.request;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
+import ru.covenant.code.landing.validation.ValidEmail;
 
 @Getter
 @Setter
@@ -15,7 +15,8 @@ public class ClientsRqDto {
     @NotBlank
     private String phone;
 
-    @Email
+    @NotBlank
+    @ValidEmail(allowedTlds = {"ru", "com", "net"})
     private String email;
 
     private String message;
