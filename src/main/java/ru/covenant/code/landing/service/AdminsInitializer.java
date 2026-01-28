@@ -24,8 +24,6 @@ public class AdminsInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         String username = defaultUsername;
 
-        if (adminsService.findByUsername(username).isPresent()) return;
-
         Admins admin = new Admins();
         admin.setUsername(username);
         admin.setRole("ADMIN");

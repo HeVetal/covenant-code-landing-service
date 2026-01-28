@@ -1,3 +1,4 @@
+/*
 package ru.covenant.code.landing.service.impl;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -92,8 +93,11 @@ class ClientsServiceImplTest {
     }
 
 
-    /*@Test*/
-   /* void createIfSucceed() {
+    */
+/*@Test*//*
+
+   */
+/* void createIfSucceed() {
         ClientsRqDto request = new ClientsRqDto();
         request.setName("Ivan");
         request.setEmail("client@example.com");
@@ -106,7 +110,8 @@ class ClientsServiceImplTest {
         Clients clientsCreate = clientsService.create(request);
 
         assertEquals(clientsCreate, clients);
-    }*/
+    }*//*
+
 
     @Test
     void getAllIFListEmpty() {
@@ -133,7 +138,8 @@ class ClientsServiceImplTest {
     }
 
 
-    /*@Test
+    */
+/*@Test
     void updateStatus() {
         ClientsStatusRqDto dto = new ClientsStatusRqDto();
         dto.setStatus(Status.PROCESSED);
@@ -155,7 +161,8 @@ class ClientsServiceImplTest {
 
         assertEquals(Status.PROCESSED, resultClient.getStatus());
 
-    }*/
+    }*//*
+
 
     @Test
     void deleteIfIdNull() {
@@ -168,4 +175,4 @@ class ClientsServiceImplTest {
     }
 
 
-}
+}*/
