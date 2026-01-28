@@ -1,72 +1,93 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      th:fragment="layout(content)">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>CovenantCodeLanding</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Covenant Code Landing</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 <header>
     <div class="header__inner">
-        <img src="logo.svg" alt="Logo" class="header__logo">
+        <a href="#" class="header__logo">LOGO</a>
         <nav class="header__nav">
             <a href="#about-us" class="header__link">О нас</a>
             <a href="#apply" class="header__link header__link--button">Отправить заявку</a>
+            <a href="/v1/registerForm" class="header__link">Регистрация</a>
+            <div class="auth-section">
+                <div>
+                    <span class="username">Имя пользователя</span>
+                    <form action="/v1/logout" method="post" style="display: inline;">
+                        <button type="submit" class="logout-btn">Выйти</button>
+                    </form>
+                </div>
+                <div>
+                    <a href="/v1/login" class="header__link">Войти</a>
+                </div>
+            </div>
         </nav>
     </div>
 </header>
 
 <main>
-    <main class="main">
-        <div class="hero-section">
-            <h2 class="title">Covenant Code</h2>
-            <b class="sub-title">подзаголовок</b><br>
-            <a href="registerForm.html" class="button-link">Зарегестрироваться</a>
-        </div>
+    <section class="hero-section">
+        <h1 class="title">Covenant Code</h1>
+        <p class="sub-title">Разработка современных IT-решений для вашего бизнеса</p>
+        <a href="/v1/registerForm" class="button-link">Зарегистрироваться</a>
+    </section>
 
-        <div class="about-us" id="about-us">
-            <h2>О нас — текстовый блок</h2>
-        </div>
+    <section class="about-us" id="about-us">
+        <h2>О нас — текстовый блок</h2>
+        <p>Мы - команда профессиональных разработчиков, специализирующаяся на создании современных веб-приложений и программных решений. Наш опыт позволяет решать сложные задачи и предоставлять качественные услуги.</p>
+    </section>
 
-
+    <section class="advantages">
         <div class="container">
             <div class="column">
                 <h3>Преимущество 1</h3>
-                <p>Содержимое первой колонки...</p>
+                <p>Высокое качество разработки с использованием современных технологий и методологий.</p>
             </div>
             <div class="column">
                 <h3>Преимущество 2</h3>
-                <p>Содержимое второй колонки...</p>
+                <p>Индивидуальный подход к каждому клиенту и гибкость в процессе работы.</p>
             </div>
             <div class="column">
                 <h3>Преимущество 3</h3>
-                <p>Содержимое третьей колонки...</p>
+                <p>Оперативная поддержка и обслуживание после завершения проекта.</p>
             </div>
         </div>
-    </main>
+    </section>
+
+    <section class="apply-section" id="apply">
+        <h2>Отправить заявку</h2>
+        <p>Для начала сотрудничества, заполните форму регистрации или свяжитесь с нами по указанным контактам.</p>
+        <a href="/v1/registerForm" class="button-link">Заполнить форму регистрации</a>
+    </section>
 </main>
 
-<footer class="footer">
-    <div class="footer-column">
-        <h3>Контакты</h3>
-        <div class="contact-info">
-            <div class="contact-line"> Адрес:</div>
-            <div class="contact-line"> Телефон:</div>
-            <div class="contact-line"> Email:</div>
+<footer>
+    <div class="footer-content">
+        <div class="footer-column">
+            <h3>Контакты</h3>
+            <div class="contact-info">
+                <div class="contact-line">Адрес: Москва, ул. Примерная, д. 1</div>
+                <div class="contact-line">Телефон: +7 (999) 123-45-67</div>
+                <div class="contact-line">Email: info@covenantcode.ru</div>
+            </div>
+        </div>
+        <div class="footer-column">
+            <h3>Навигация</h3>
+            <div class="links">
+                <a href="/">Главная</a>
+                <a href="#about-us">О нас</a>
+                <a href="#apply">Отправить заявку</a>
+                <a href="/v1/registerForm">Регистрация</a>
+                <a href="/v1/login">Войти</a>
+            </div>
         </div>
     </div>
-    <div class="footer-column">
-        <h3>Навигация</h3>
-        <div class="links">
-            <a href="#">Главная</a>
-            <a href="#">Услуги</a>
-        </div>
-    </div>
-
     <div class="footer-copyright">
-        <p>&copy; 2025 CovenantCodeLanding. Все права защищены.</p>
+        <p>&copy; 2025 Covenant Code Landing. Все права защищены.</p>
     </div>
 </footer>
 </body>

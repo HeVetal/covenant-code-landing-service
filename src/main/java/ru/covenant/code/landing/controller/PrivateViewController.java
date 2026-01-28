@@ -15,11 +15,11 @@ import java.util.UUID;
 
 @Controller
 @RequestMapping(value = "/admin/clients", produces = MediaType.TEXT_HTML_VALUE)
-public class ViewController {
+public class PrivateViewController {
 
     private final ClientsService clientsService;
 
-    public ViewController(ClientsService service) {
+    public PrivateViewController(ClientsService service) {
         this.clientsService = service;
     }
 
