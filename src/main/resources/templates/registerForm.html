@@ -11,8 +11,8 @@
 </div>
 <form th:action="@{/form}" th:object="${user}" method="post">
     <label for="name">Имя: </label>
+    <!--/*@thymesVar id="name" type=""*/-->
     <input type="text" id="name" pattern="[a-zA-Zа-яА-Я]+" th:field="*{name}"><br>
-
     <label for="phone">Phone: </label>
     <input type="text" id="phone" pattern="^[0-9\-\+\(\)\s]+$" th:field="*{phone}"><br>
 

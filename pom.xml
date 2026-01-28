@@ -102,6 +102,7 @@
         <plugins>
 
             <!-- ========= JAVA COMPILATION ========= -->
+            <!-- ========= JAVA COMPILATION ========= -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -122,6 +123,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
 
             <!-- ========= SPRING BOOT PACKAGING ========= -->
             <plugin>
