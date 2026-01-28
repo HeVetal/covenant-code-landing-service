@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.covenant.code.landing.validation.MaxLength;
 import ru.covenant.code.landing.validation.ValidEmail;
+import ru.covenant.code.landing.validation.ValidPhone;
 
 @Getter
 @Setter
@@ -16,6 +17,7 @@ public class ClientsRqDto {
     private String name;
 
     @NotBlank
+    @ValidPhone()
     @MaxLength(value = 20, message = "Поле phone должно быть не длиннее 20 символов")
     private String phone;
 
