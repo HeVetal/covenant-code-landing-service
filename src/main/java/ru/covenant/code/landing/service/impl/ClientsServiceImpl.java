@@ -30,7 +30,8 @@ public class ClientsServiceImpl implements ClientsService {
 
     @Override
     public Clients getById(UUID id) {
-        return null;
+        return clientsRepository.findById(id)
+                .orElseThrow(() -> new ClientsNotFoundException("Клиент с таким id не найден: " + id));
     }
 
     @Transactional
@@ -38,10 +39,6 @@ public class ClientsServiceImpl implements ClientsService {
         log.info("Creating new client: name={}, email={}", clientsRqDto.getName(), clientsRqDto.getEmail());
 
         Clients client = clientsMapper.mapToClients(clientsRqDto);
-        client.setName(clientsRqDto.getName());
-        client.setPhone(clientsRqDto.getPhone());
-        client.setEmail(clientsRqDto.getEmail());
-        client.setMessage(clientsRqDto.getMessage());
 
         Clients savedClient = clientsRepository.save(client);
         log.info("Client created with id: {}", savedClient.getId());
@@ -51,7 +48,7 @@ public class ClientsServiceImpl implements ClientsService {
 
     @Override
     public List<Clients> getAll() {
-        return List.of();
+        return clientsRepository.findAll();
     }
 
     // Метод для получения всех клиентов для админки

@@ -15,8 +15,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ClientsMapper {
 
-    @Mapping(source = "email", target = "email")
-    @Mapping(source = "message", target = "message")
     @Mapping(constant = "NEW", target = "status")
     @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "createdAt")
