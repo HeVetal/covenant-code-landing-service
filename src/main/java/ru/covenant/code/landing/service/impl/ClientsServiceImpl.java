@@ -1,149 +1,132 @@
 package ru.covenant.code.landing.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.covenant.code.landing.dto.response.ClientsDetailsRsDto;
+import org.springframework.transaction.annotation.Transactional;
 import ru.covenant.code.landing.dto.request.ClientsRqDto;
 import ru.covenant.code.landing.dto.request.ClientsStatusRqDto;
 import ru.covenant.code.landing.dto.response.ClientsAdminRsDto;
-import ru.covenant.code.landing.dto.response.ClientsCreateRsDto;
-import ru.covenant.code.landing.dto.response.ClientsListRsDto;
+import ru.covenant.code.landing.dto.response.ClientsDetailsRsDto;
 import ru.covenant.code.landing.entity.Clients;
 import ru.covenant.code.landing.entity.enumerated.Status;
 import ru.covenant.code.landing.exceptions.ClientsNotFoundException;
 import ru.covenant.code.landing.exceptions.InvalidClientsStatusException;
-import ru.covenant.code.landing.exceptions.PersistenceException;
 import ru.covenant.code.landing.mapper.ClientsMapper;
 import ru.covenant.code.landing.repository.ClientsRepository;
 import ru.covenant.code.landing.service.ClientsService;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ClientsServiceImpl implements ClientsService {
+
     private final ClientsRepository clientsRepository;
     private final ClientsMapper clientsMapper;
 
-    @Autowired
-    public ClientsServiceImpl(ClientsRepository clientsRepository,
-                              ClientsMapper clientsMapper) {
-        this.clientsRepository = clientsRepository;
-        this.clientsMapper = clientsMapper;
-    }
-
     @Override
     public Clients getById(UUID id) {
-        uuidIsNull(id);
-        Clients client;
-        try {
-            client = clientsRepository.findById(id).orElseThrow(() -> new ClientsNotFoundException());
-        } catch (ClientsNotFoundException e) {
-            log.error("Заявка не найдена");
-            throw e;
-        }
-        return client;
+        return null;
     }
 
-    @Override
-    public ClientsCreateRsDto create(ClientsRqDto request) {
-        if (request == null) {
-            log.error("входящий параметр = null");
-            throw new IllegalArgumentException("request = null");
-        }
-        Clients clients = clientsMapper.mapToClients(request);
-        Clients saveClient;
-        try {
-            saveClient = clientsRepository.save(clients);
-        } catch (Exception e) {
-            log.error("Ошибка при сохранении клиента");
-            throw new PersistenceException();
-        }
-        ClientsCreateRsDto clientsCreateRsDto = new ClientsCreateRsDto();
-        clientsCreateRsDto.setId(saveClient.getId().toString());
-        clientsCreateRsDto.setStatus(saveClient.getStatus().toString());
+    @Transactional
+    public ClientsDetailsRsDto create(ClientsRqDto clientsRqDto) {
+        log.info("Creating new client: name={}, email={}", clientsRqDto.getName(), clientsRqDto.getEmail());
 
-        return clientsCreateRsDto;
+        Clients client = clientsMapper.mapToClients(clientsRqDto);
+        client.setName(clientsRqDto.getName());
+        client.setPhone(clientsRqDto.getPhone());
+        client.setEmail(clientsRqDto.getEmail());
+        client.setMessage(clientsRqDto.getMessage());
+
+        Clients savedClient = clientsRepository.save(client);
+        log.info("Client created with id: {}", savedClient.getId());
+
+        return clientsMapper.mapToClientsDetailsRs(savedClient);
     }
 
     @Override
     public List<Clients> getAll() {
-        return clientsRepository.findAll();
+        return List.of();
     }
 
-    @Override
-    public ClientsDetailsRsDto updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
-        if (clientsStatusRqDto == null) {
-            throw new IllegalArgumentException("Клиент статус dto = null");
-        }
-        uuidIsNull(id);
-
-        Status clientStatus = clientStatus(clientsStatusRqDto);
-        statusIsNull(clientStatus);
-        boolean isValidStatus = Arrays.stream(Status.values())
-                .anyMatch(status -> status.name().equals(clientStatus.name()));
-
-        if (!isValidStatus) {
-            log.error("Некорректный статус");
-            throw new InvalidClientsStatusException();
-        }
-
-        Clients client = getById(id);
-
-        if (client.getStatus() != Status.NEW) {
-            log.error("Нельзя изменить статус: заявка уже не NEW. Текущий статус: {}", client.getStatus());
-            throw new InvalidClientsStatusException();
-        }
-
-        if (clientStatus != Status.PROCESSED) {
-            log.error("Некорректная смена статуса: разрешено только NEW -> PROCESSED. Запрошен: {}", clientStatus);
-            throw new InvalidClientsStatusException();
-        }
-        client.setStatus(clientStatus);
-        Clients saved = clientsRepository.save(client);
-        return clientsMapper.mapToClientsDetailsRs(saved);
-    }
-
-
-    @Override
-    public void delete(UUID id) {
-        uuidIsNull(id);
-        getById(id);
-        clientsRepository.deleteById(id);
-    }
-
-    @Override
+    // Метод для получения всех клиентов для админки
     public List<ClientsAdminRsDto> getAllAdminClients() {
-        return clientsRepository.findAll().stream()
-                .map(clientsMapper::mapToClientsAdminRsDto)
-                .toList();
-    }
+        log.info("Getting all clients for admin");
+        List<Clients> clients = clientsRepository.findAll();
+        log.info("Found {} clients in repository", clients.size());
 
+        List<ClientsAdminRsDto> result = clientsMapper.mapToClientsAdminRsDtoList(clients);
 
-    public void uuidIsNull(UUID id) {
-        if (id == null) {
-            log.error("Id равняется null");
-            throw new IllegalArgumentException("Id не может быть null");
+        // Отладочная информация
+        if (!result.isEmpty()) {
+            log.info("First client in result: id={}, name={}, email={}, createdAt={}",
+                    result.get(0).getId(), result.get(0).getName(),
+                    result.get(0).getEmail(), result.get(0).getCreatedAt());
         }
+
+        return result;
     }
 
-    public void statusIsNull(Status status) {
-        if (status == null) {
-            log.error("Status равняется null");
-            throw new InvalidClientsStatusException();
-        }
-    }
-
-    public Status clientStatus(ClientsStatusRqDto clientsStatusRqDto) {
-        return clientsStatusRqDto.getStatus();
-    }
-
-    @Override
+    // Метод для получения клиента по ID для админки
     public ClientsAdminRsDto getAdminClientById(UUID id) {
-        Clients client = getById(id);
-        return clientsMapper.mapToClientsAdminRsDto(client);
+        log.info("Getting client by id for admin: {}", id);
+        Clients client = clientsRepository.findById(id)
+                .orElseThrow(() -> new ClientsNotFoundException("Client not found with id: " + id));
+
+        ClientsAdminRsDto dto = clientsMapper.mapToClientsAdminRsDto(client);
+        log.info("Found client: id={}, name={}, email={}", dto.getId(), dto.getName(), dto.getEmail());
+
+        return dto;
+    }
+
+    @Transactional
+    public ClientsDetailsRsDto updateStatus(UUID id, ClientsStatusRqDto clientsStatusRqDto) {
+        log.info("Updating status for client id={} to {}", id, clientsStatusRqDto.getStatus());
+
+        Clients client = clientsRepository.findById(id)
+                .orElseThrow(() -> new ClientsNotFoundException("Client not found with id: " + id));
+
+        // Проверка допустимости изменения статуса
+        if (!isValidStatusTransition(client.getStatus(), clientsStatusRqDto.getStatus())) {
+            throw new InvalidClientsStatusException(
+                    "Cannot change status from " + client.getStatus() + " to " + clientsStatusRqDto.getStatus()
+            );
+        }
+
+        client.setStatus(clientsStatusRqDto.getStatus());
+        Clients updatedClient = clientsRepository.save(client);
+
+        return clientsMapper.mapToClientsDetailsRs(updatedClient);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        log.info("Deleting client with id: {}", id);
+        if (!clientsRepository.existsById(id)) {
+            throw new ClientsNotFoundException("Client not found with id: " + id);
+        }
+        clientsRepository.deleteById(id);
+        log.info("Client deleted successfully");
+    }
+
+    private boolean isValidStatusTransition(Status currentStatus, Status newStatus) {
+        // Простая валидация переходов статусов
+        if (currentStatus == Status.NEW) {
+            return newStatus == Status.PROCESSED;
+        }
+        if (currentStatus == Status.PROCESSED) {
+            return newStatus == Status.NEW;
+        }
+        return false;
+    }
+
+    // Дополнительный метод для отладки - получить все "сырые" клиенты
+    public List<Clients> getAllClientsRaw() {
+        return clientsRepository.findAll();
     }
 }

@@ -1,12 +1,11 @@
 package ru.covenant.code.landing.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import ru.covenant.code.landing.validation.MaxLength;
-import ru.covenant.code.landing.validation.ValidEmail;
-import ru.covenant.code.landing.validation.ValidPhone;
+import ru.covenant.code.landing.validation.annotation.MaxLength;
+import ru.covenant.code.landing.validation.annotation.ValidEmail;
+import ru.covenant.code.landing.validation.annotation.ValidPhone;
 
 @Getter
 @Setter

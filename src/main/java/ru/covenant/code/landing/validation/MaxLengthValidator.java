@@ -2,6 +2,7 @@ package ru.covenant.code.landing.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import ru.covenant.code.landing.validation.annotation.MaxLength;
 
 public class MaxLengthValidator implements ConstraintValidator<MaxLength, String> {
 

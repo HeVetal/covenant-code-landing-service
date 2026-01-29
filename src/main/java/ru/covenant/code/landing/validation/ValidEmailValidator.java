@@ -2,6 +2,7 @@ package ru.covenant.code.landing.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import ru.covenant.code.landing.validation.annotation.ValidEmail;
 
 import java.util.Arrays;
 import java.util.HashSet;

@@ -2,84 +2,162 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Client details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали заявки | Covenant Code Admin</title>
+    <link rel="icon" th:href="@{/logo.svg}" type="image/svg+xml">
+    <link rel="stylesheet" th:href="@{/css/client-details.css}">
 </head>
 <body>
 
-<h2>Карточка заявки</h2>
+<div class="container">
+    <!-- Шапка -->
+    <div class="header">
+        <div class="header-title">
+            <h1>Детали заявки <span class="brand">Covenant Code</span></h1>
+            <p>Панель управления заявками</p>
+        </div>
+        <a th:href="@{/admin/clients}" class="btn btn-back">
+            <span class="btn-icon">←</span> Назад к списку
+        </a>
+    </div>
 
-<p th:if="${success == 'processed'}" style="color:green;">
-    ✅ Заявка отмечена как PROCESSED
-</p>
+    <!-- Уведомление об успехе -->
+    <div th:if="${success == 'processed'}" class="notification success">
+        <span class="btn-icon">✅</span>
+        <div>
+            <strong>Заявка успешно обработана!</strong>
+            <p>Статус изменен на PROCESSED</p>
+        </div>
+    </div>
 
-<div>
-    <p><b>ID:</b> <span th:text="${client.id}">id</span></p>
-    <p><b>Имя:</b> <span th:text="${client.name}">name</span></p>
-    <p><b>Телефон:</b> <span th:text="${client.phone}">phone</span></p>
-    <p><b>Email:</b> <span th:text="${client.email}">email</span></p>
-    <p><b>Статус:</b> <span th:text="${client.status}">status</span></p>
-    <p><b>Дата:</b> <span th:text="${client.createdAt}">createdAt</span></p>
+    <!-- Карточка заявки -->
+    <div class="card">
+        <div class="card-header">
+            <div class="client-id">
+                <h2>Заявка клиента</h2>
+                <div class="id-number" th:text="${client.id}">ID</div>
+            </div>
+            <div th:classappend="'client-status ' + (${client.status?.name() == 'NEW'} ? 'status-new' : 'status-processed')"
+                 th:text="${client.status}">
+                Статус
+            </div>
+        </div>
+
+        <div class="client-info">
+            <!-- Информация о клиенте -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Имя клиента</span>
+                    <div class="info-value" th:text="${client.name}">Имя</div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Телефон</span>
+                    <div class="info-value" th:text="${client.phone}">Телефон</div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Email</span>
+                    <div class="info-value" th:text="${client.email}">Email</div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Дата создания</span>
+                    <div class="info-value date-time"
+                         th:text="${#temporals.format(client.createdAt, 'dd.MM.yyyy HH:mm:ss')}">
+                        Дата
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Текущий статус</span>
+                    <div th:classappend="'client-status ' + (${client.status?.name() == 'NEW'} ? 'status-new' : 'status-processed')"
+                         th:text="${client.status}"
+                         style="margin: 0; display: inline-block;">
+                        Статус
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сообщение клиента (если есть) -->
+            <div th:if="${client.message}" class="message-section">
+                <div class="message-header">
+                    <span class="btn-icon">💬</span>
+                    <h3>Сообщение от клиента</h3>
+                </div>
+                <div class="message-content" th:text="${client.message}">
+                    Сообщение
+                </div>
+            </div>
+        </div>
+
+        <!-- Действия -->
+        <div class="actions">
+            <!-- Кнопка для изменения статуса через HTML-контроллер -->
+            <form th:action="@{/admin/clients/{id}/status(id=${client.id})}" method="post" style="display: inline;">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                <input type="hidden" name="status" value="PROCESSED" />
+                <button type="submit"
+                        th:classappend="${client.status?.name() == 'NEW'} ? 'btn btn-process' : 'btn btn-process'"
+                        th:disabled="${client.status?.name() != 'NEW'}"
+                        class="btn btn-process">
+                    <span class="btn-icon">✓</span>
+                    <span th:text="${client.status?.name() == 'NEW'} ? 'Обработать' : 'Обработано'">
+                        Обработать
+                    </span>
+                </button>
+            </form>
+
+            <!-- Кнопка удаления -->
+            <button id="deleteBtn"
+                    class="btn btn-delete"
+                    onclick="showDeleteModal()">
+                <span class="btn-icon">🗑️</span>
+                Удалить заявку
+            </button>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <div class="footer">
+        <p>Covenant Code Admin Panel • <span th:text="${#dates.year(#dates.createNow())}">2024</span></p>
+        <p>Все права защищены</p>
+    </div>
 </div>
 
-<hr>
+<!-- Модальное окно подтверждения удаления -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-icon">⚠️</div>
+        <h2 class="modal-title">Подтвердите удаление</h2>
+        <p class="modal-text">
+            Вы уверены, что хотите удалить заявку от клиента
+            <strong th:text="${client.name}">Клиент</strong>?
+            <br><br>
+            <small>Это действие невозможно отменить. Все данные будут удалены безвозвратно.</small>
+        </p>
+        <div class="modal-actions">
+            <button type="button" class="modal-btn modal-btn-cancel" onclick="hideDeleteModal()">
+                Отмена
+            </button>
+            <!-- Форма для удаления через HTML-контроллер -->
+            <form th:action="@{/admin/clients/{id}/delete(id=${client.id})}" method="post" style="display: inline;">
+                <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                <button type="submit" class="modal-btn modal-btn-confirm">
+                    Да, удалить
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
-<button
-        id="processBtn"
-        th:if="${client.status == 'NEW'}"
-        onclick="processClient()">
-    Отработано
-</button>
+<!-- Индикатор загрузки -->
+<div id="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Обработка запроса...</p>
+</div>
 
-<button
-        id="deleteBtn"
-        type="button"
-        onclick="deleteClient()">
-    Удалить
-</button>
-
-<a th:href="@{/admin/clients}">Назад к списку</a>
-
-
-<script th:inline="javascript">
-    function processClient() {
-        const clientId = '[[${client.id}]]';
-
-        fetch(`/admin/clients/${clientId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({status:'PROCESSED'})
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Ошибка обновления статуса');
-                window.location.href = `/admin/clients/${clientId}?success=processed`;
-            })
-            .catch(() => alert('Не удалось обновить статус'));
-    }
-
-    function deleteClient() {
-        const clientId = '[[${client.id}]]';
-
-        const ok = confirm('Вы уверены, что хотите удалить заявку?\nЭто действие невозможно отменить.');
-        if (!ok) return;
-
-        fetch(`/admin/clients/${clientId}`, {
-            method: 'DELETE',
-            headers: {'Accept': 'application/json'}
-        })
-            .then(response => {
-                if (response.status === 404) {
-                    window.location.href = '/admin/clients?error=notfound';
-                    return;
-                }
-                if (!response.ok) throw new Error('Ошибка удаления');
-                window.location.href = '/admin/clients?success=deleted';
-            })
-            .catch(() => alert('Не удалось удалить заявку'));
-    }
-</script>
+<script th:src="@{/js/client-details.js}"></script>
 
 </body>
 </html>
