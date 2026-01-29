@@ -21,20 +21,29 @@ import ru.covenant.code.landing.entity.Admins;
 import ru.covenant.code.landing.service.AdminsService;
 import ru.covenant.code.landing.service.ClientsService;
 
+
+/**
+ * Контроллер для публичных страниц и форм регистрации.
+ */
 @Controller
 @RequestMapping("/v1")
 public class PublicViewController {
 
     private final ClientsService clientsService;
     private final AdminsService adminsService;
-    private final PasswordEncoder passwordEncoder;
 
     public PublicViewController(ClientsService clientsService, AdminsService adminsService, PasswordEncoder passwordEncoder) {
         this.clientsService = clientsService;
         this.adminsService = adminsService;
-        this.passwordEncoder = passwordEncoder;
     }
 
+
+    /**
+     * Отображает главную страницу и состояние авторизации.
+     *
+     * @param model модель представления
+     * @return имя шаблона
+     */
     @GetMapping({"", "/", "/layout"})
     public String layout(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -59,6 +68,14 @@ public class PublicViewController {
         return "layout";
     }
 
+    /**
+     * Страница авторизации.
+     *
+     * @param model  модель представления
+     * @param error  флаг ошибки авторизации
+     * @param logout флаг выхода
+     * @return имя шаблона
+     */
     @GetMapping("/login")
     public String login(Model model,
                         @RequestParam(value = "error", required = false) String error,
@@ -78,6 +95,14 @@ public class PublicViewController {
         return "login";
     }
 
+
+    /**
+     * Форма регистрации клиента.
+     *
+     * @param model   модель представления
+     * @param success флаг успешной регистрации
+     * @return имя шаблона
+     */
     @GetMapping("/registerForm")
     public String registerForm(Model model,
                                @RequestParam(value = "success", required = false) String success) {
@@ -92,6 +117,14 @@ public class PublicViewController {
         return "registerForm";
     }
 
+    /**
+     * Обрабатывает отправку формы регистрации клиента.
+     *
+     * @param clientsRqDto       данные формы
+     * @param bindingResult      результат валидации
+     * @param redirectAttributes атрибуты редиректа
+     * @return адрес редиректа
+     */
     @PostMapping("/registerForm")
     public String handleRegisterForm(
             @Valid @ModelAttribute("user") ClientsRqDto clientsRqDto,
@@ -114,6 +147,13 @@ public class PublicViewController {
         }
     }
 
+
+    /**
+     * Форма регистрации администратора.
+     *
+     * @param model модель представления
+     * @return имя шаблона
+     */
     @GetMapping("/admin/register")
     public String adminRegisterForm(Model model) {
         if (!model.containsAttribute("admin")) {
@@ -122,6 +162,15 @@ public class PublicViewController {
         return "admin-register";
     }
 
+
+    /**
+     * Обрабатывает регистрацию администратора.
+     *
+     * @param adminRegistrationRqDto данные формы
+     * @param bindingResult          результат валидации
+     * @param redirectAttributes     атрибуты редиректа
+     * @return адрес редиректа
+     */
     @PostMapping("/admin/register")
     public String handleAdminRegisterForm(
             @Valid @ModelAttribute("admin") AdminRegistrationRqDto adminRegistrationRqDto,
@@ -145,13 +194,7 @@ public class PublicViewController {
         }
 
         try {
-            // Создаем нового админа
-            Admins admin = new Admins();
-            admin.setUsername(adminRegistrationRqDto.getUsername());
-            admin.setPassword(passwordEncoder.encode(adminRegistrationRqDto.getPassword()));
-            admin.setRole(adminRegistrationRqDto.getRole());
-
-            adminsService.save(admin);
+            adminsService.register(adminRegistrationRqDto);
 
             redirectAttributes.addFlashAttribute("success", "Администратор успешно зарегистрирован!");
             return "redirect:/v1/admin/register";

@@ -2,6 +2,7 @@ package ru.covenant.code.landing.controller;
 
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,16 +16,22 @@ import ru.covenant.code.landing.dto.response.ResponseWrapper;
 import ru.covenant.code.landing.service.ClientsService;
 
 
+/**
+ * REST-контроллер для обработки заявок клиентов.
+ */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/v1/api/clients")
 public class ClientsController {
+
     private final ClientsService clientsService;
 
-    @Autowired
-    public ClientsController(ClientsService clientsService) {
-        this.clientsService = clientsService;
-    }
-
+    /**
+     * Создает новую заявку клиента.
+     *
+     * @param clientsRq данные заявки
+     * @return ответ с данными заявки
+     */
     @PostMapping
     public ResponseEntity<ResponseWrapper<ClientsDetailsRsDto>> addClients(@Valid @RequestBody ClientsRqDto clientsRq) {
         ClientsDetailsRsDto clientsCreateRsDto = clientsService.create(clientsRq);
