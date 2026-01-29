@@ -2,6 +2,7 @@ package ru.covenant.code.landing.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import ru.covenant.code.landing.validation.annotation.ValidPhone;
 
 public class ValidPhoneValidator implements ConstraintValidator<ValidPhone, String> {
 

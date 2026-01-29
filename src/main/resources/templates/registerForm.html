@@ -2,40 +2,107 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>RegisterForm</title>
+    <title>Форма заявки - Covenant Code</title>
+    <link rel="icon" th:href="@{/logo.svg}" type="image/svg+xml">
+    <link rel="stylesheet" th:href="@{/css/registerForm.css}">
 </head>
 <body>
-<div style="display: none;">
-    param.error: <span th:text="${param.error}">none</span><br>
-    param.success: <span th:text="${param.success}">none</span>
+<!-- Основной контейнер формы -->
+<div class="form-container">
+    <div class="form-header">
+        <h1>Отправить заявку</h1>
+        <p>Заполните форму и мы свяжемся с вами в ближайшее время</p>
+    </div>
+
+    <!-- Сообщения об ошибках -->
+    <div th:if="${error}" class="error-message" style="margin-bottom: 20px; padding: 10px; background: #fed7d7; border-radius: 6px;">
+        <span th:text="${error}">Ошибка при регистрации</span>
+    </div>
+
+    <form th:action="@{/v1/registerForm}" th:object="${user}" method="post">
+        <!-- Имя -->
+        <div class="form-group">
+            <label for="name">Имя:</label>
+            <input type="text"
+                   id="name"
+                   th:field="*{name}"
+                   placeholder="Введите ваше имя"
+                   required>
+            <div th:if="${#fields.hasErrors('name')}"
+                 th:errors="*{name}"
+                 class="error-message"></div>
+        </div>
+
+        <!-- Телефон -->
+        <div class="form-group">
+            <label for="phone">Телефон:</label>
+            <input type="text"
+                   id="phone"
+                   th:field="*{phone}"
+                   placeholder="+7 (999) 123-45-67"
+                   required>
+            <div th:if="${#fields.hasErrors('phone')}"
+                 th:errors="*{phone}"
+                 class="error-message"></div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email"
+                   id="email"
+                   th:field="*{email}"
+                   placeholder="example@email.com"
+                   required>
+            <div th:if="${#fields.hasErrors('email')}"
+                 th:errors="*{email}"
+                 class="error-message"></div>
+        </div>
+
+        <!-- Сообщение -->
+        <div class="form-group">
+            <label for="message">Сообщение:</label>
+            <textarea
+                    id="message"
+                    th:field="*{message}"
+                    placeholder="Расскажите о вашем проекте или задайте вопрос..."
+                    required></textarea>
+            <div th:if="${#fields.hasErrors('message')}"
+                 th:errors="*{message}"
+                 class="error-message"></div>
+        </div>
+
+        <button type="submit" class="submit-btn">Отправить заявку</button>
+    </form>
+
+    <div class="links">
+        <a th:href="@{/v1/layout}">← Вернуться на главную</a>
+    </div>
 </div>
-<form th:action="@{/v1/registerForm}" th:object="${user}" method="post">
-    <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color: red"></div>
-    <label for="name">Имя: </label>
-    <input type="text" id="name" th:field="*{name}"><br>
 
-    <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" style="color: red"></div>
-    <label for="phone">Phone: </label>
-    <input type="text" id="phone" th:field="*{phone}"><br>
+<!-- Модальное окно успеха -->
+<div id="successModal" class="modal-overlay">
+    <div class="modal-content modal-success">
+        <div class="modal-icon">✓</div>
+        <h2 class="modal-title">Заявка отправлена!</h2>
+        <p class="modal-message">Спасибо за вашу заявку. Мы свяжемся с вами в ближайшее время.</p>
+        <div id="successCountdown" class="modal-countdown">Перенаправление на главную через: <span id="successSeconds">5</span> секунд</div>
+        <a th:href="@{/v1/layout}" class="back-link">Перейти на главную</a>
+    </div>
+</div>
 
-    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" style="color: red"></div>
-    <label for="email">Email: </label>
-    <input type="email" id="email" th:field="*{email}"><br>
+<!-- Модальное окно ошибки -->
+<div id="errorModal" class="modal-overlay">
+    <div class="modal-content modal-error">
+        <div class="modal-icon">✗</div>
+        <h2 class="modal-title">Ошибка отправки</h2>
+        <p class="modal-message">Произошла ошибка при отправке заявки. Пожалуйста, попробуйте позже.</p>
+        <div id="errorCountdown" class="modal-countdown">Перенаправление на главную через: <span id="errorSeconds">5</span> секунд</div>
+        <a th:href="@{/v1/layout}" class="back-link">Перейти на главную</a>
+    </div>
+</div>
 
-    <div th:if="${#fields.hasErrors('message')}" th:errors="*{message}" style="color: red"></div>
-    <label for="message">Message: </label>
-    <textarea id="message" th:field="*{message}"></textarea><br>
+<script th:src="@{/js/registerForm.js}"></script>
 
-    <button type="submit">Отправить</button>
-</form>
-
-<script th:if="${param.error}">
-    alert("Что-то пошло не так, попробуйте повторить попытку позже")
-</script>
-
-<script th:if="${param.success}">
-    alert("Форма успешно отправлена!");
-    setTimeout(() => window.location.href = '/v1/success', 100);
-</script>
 </body>
 </html>

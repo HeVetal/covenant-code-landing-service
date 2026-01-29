@@ -36,16 +36,31 @@ header {
 }
 
 .header__logo {
-    width: 150px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    border-radius: 4px;
     text-decoration: none;
+    color: inherit;
+    gap: 10px;
+}
+
+.logo-img {
+    height: 40px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.05);
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
 }
 
 .header__nav {
@@ -218,11 +233,10 @@ footer {
 
 .footer-content {
     max-width: 1200px;
-    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 40px;
-    margin-bottom: 30px;
+    margin: 0 auto 30px;
 }
 
 .footer-column h3 {
@@ -324,5 +338,237 @@ footer {
         width: 100%;
         justify-content: center;
         margin-top: 10px;
+    }
+}
+
+/* Добавить в существующие стили */
+
+/* Улучшение читаемости ссылок в футере */
+.footer-link {
+    color: #a0aec0;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-link:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+/* Улучшение для навигации в футере */
+.footer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Улучшение для кнопки выхода */
+.logout-btn {
+    background: none;
+    border: none;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.logout-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    text-decoration: none;
+}
+
+/* Улучшение отступов для auth-section */
+.auth-section__logged-in {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-section__logged-out {
+    display: flex;
+    align-items: center;
+}
+
+/* Улучшение для заголовков преимуществ на мобильных */
+@media (max-width: 768px) {
+    .column h3 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Улучшение focus-стилей для доступности */
+.header__link:focus,
+.button-link:focus,
+.footer-link:focus,
+.logout-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Добавить или обновить существующие стили */
+
+/* Стиль для кнопки "Оставить заявку" в герое */
+.hero-section .button-link {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    padding: 14px 35px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.hero-section .button-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
+    color: white;
+}
+
+/* Контейнер для кнопок в секции заявки */
+.apply-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+}
+
+/* Основная кнопка в секции заявки */
+.apply-section .button-link {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.apply-section .button-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    color: white;
+}
+
+/* Вторичная кнопка */
+.button-link--secondary {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%) !important;
+}
+
+.button-link--secondary:hover {
+    box-shadow: 0 10px 25px rgba(237, 137, 54, 0.4) !important;
+}
+
+/* Улучшение focus-стилей для доступности */
+.button-link:focus,
+.header__link:focus,
+.footer-link:focus,
+.logout-btn:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+/* Адаптивность для кнопок */
+@media (max-width: 768px) {
+    .apply-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .apply-section .button-link,
+    .hero-section .button-link {
+        padding: 12px 25px;
+        font-size: 1rem;
+        width: 100%;
+        max-width: 280px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-section .button-link {
+        padding: 12px 20px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Стиль для ссылки в админку в хедере */
+.auth-section__logged-in .header__link {
+    margin-right: 10px;
+}
+
+/* Адаптивность для auth-section */
+@media (max-width: 768px) {
+    .auth-section__logged-in {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .auth-section__logged-in .header__link,
+    .auth-section__logged-in .logout-btn {
+        margin: 5px 0;
+    }
+}
+
+footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.footer-logo-img {
+    height: 30px;
+    width: auto;
+    opacity: 0.8;
+}
+
+.footer-logo-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media (max-width: 768px) {
+    .logo-img {
+        height: 32px;
+    }
+
+    .logo-text {
+        font-size: 1.2rem;
+    }
+
+    .footer-logo-img {
+        height: 24px;
+    }
+
+    .footer-logo-text {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-text {
+        display: none; /* На очень маленьких экранах можно скрыть текст */
+    }
+
+    .logo-img {
+        height: 28px;
     }
 }
