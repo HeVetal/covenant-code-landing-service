@@ -1,7 +1,8 @@
-package ru.covenant.code.landing.validation;
+package ru.covenant.code.landing.validation.annotation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+import ru.covenant.code.landing.validation.MaxLengthValidator;
 
 import java.lang.annotation.*;
 

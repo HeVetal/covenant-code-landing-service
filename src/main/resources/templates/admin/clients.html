@@ -1,57 +1,136 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin | Clients</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка - Заявки | Covenant Code</title>
+    <link rel="icon" th:href="@{/logo.svg}" type="image/svg+xml">
+    <link rel="stylesheet" th:href="@{/css/clients.css}">
 </head>
 <body>
+<div class="admin-container">
+    <!-- Шапка -->
+    <div class="admin-header">
+        <h1>Админпанель <span>Covenant Code</span></h1>
+        <a th:href="@{/v1/layout}" class="back-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            На главную
+        </a>
+    </div>
 
-<h2>Список заявок</h2>
+    <!-- Карточки статистики -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-number" th:text="${clientsCount}">0</div>
+            <div class="stat-label">Всего заявок</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${newCount}">0</div>
+            <div class="stat-label">Новых заявок</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${processedCount}">0</div>
+            <div class="stat-label">Обработанных</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" th:text="${todayCount}">0</div>
+            <div class="stat-label">Сегодня</div>
+        </div>
+    </div>
 
-<p th:if="${success == 'deleted'}" style="color:green;">
-    ✅ Заявка удалена
-</p>
+    <!-- Сообщения -->
+    <div th:if="${success == 'deleted'}" class="alert alert-success">
+        ✅ Заявка успешно удалена
+    </div>
 
-<p th:if="${error == 'notfound'}" style="color:red;">
-    ❌ Заявка не найдена
-</p>
+    <div th:if="${error == 'notfound'}" class="alert alert-error">
+        ❌ Заявка не найдена
+    </div>
 
-<table border="1" cellpadding="6" cellspacing="0">
-    <thead>
-    <tr>
-        <th>Имя</th>
-        <th>Телефон</th>
-        <th>Email</th>
-        <th>Статус</th>
-        <th>Дата</th>
-        <th>Действия</th>
-    </tr>
-    </thead>
+    <!-- Таблица заявок -->
+    <div class="clients-table-container">
+        <div class="table-header">
+            <h2>Список заявок</h2>
+        </div>
 
-    <tbody>
-    <tr th:each="c : ${clients}">
-        <td th:text="${c.name}">name</td>
-        <td th:text="${c.phone}">phone</td>
-        <td th:text="${c.email}">email</td>
-        <td th:text="${c.status}">status</td>
-        <td th:text="${c.createdAt}">createdAt</td>
+        <div th:if="${clientsCount > 0}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Имя</th>
+                    <th>Телефон</th>
+                    <th>Email</th>
+                    <th>Статус</th>
+                    <th>Дата создания</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${clients}">
+                    <td th:text="${c.name}">Имя</td>
+                    <td th:text="${c.phone}">Телефон</td>
+                    <td th:text="${c.email}">Email</td>
+                    <td>
+                                <span th:classappend="'status-badge status-' + ${c.status?.name()?.toLowerCase()}"
+                                      th:text="${c.status}">Статус</span>
+                    </td>
+                    <td class="date-cell" th:text="${#temporals.format(c.createdAt, 'dd.MM.yyyy HH:mm')}">
+                        Дата
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a th:href="@{/admin/clients/{id}(id=${c.id})}"
+                               class="action-btn action-btn-view">
+                                Открыть
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <td>
+        <!-- Сообщение если заявок нет -->
+        <div th:unless="${clientsCount > 0}" class="empty-state">
+            <div class="empty-icon">📭</div>
+            <h3>Заявок пока нет</h3>
+            <p>Как только клиенты заполнят форму на сайте, заявки появятся здесь.</p>
+        </div>
+    </div>
 
-            <a th:href="@{/admin/clients/{id}(id=${c.id})}">Открыть</a>
+    <!-- Футер -->
+    <div class="footer">
+        <p>Covenant Code Admin Panel • <span th:text="${#dates.year(#dates.createNow())}">2025</span></p>
+    </div>
+</div>
 
+<!-- Модальное окно подтверждения удаления -->
+<div id="confirmModal" class="confirm-modal">
+    <div class="confirm-modal-content">
+        <div class="confirm-icon">🗑️</div>
+        <h2 class="confirm-title">Подтверждение удаления</h2>
+        <p class="confirm-message" id="confirmMessage">
+            Вы уверены, что хотите удалить заявку от <span id="clientName"></span>?
+        </p>
+        <div class="confirm-buttons">
+            <button type="button" class="confirm-btn confirm-btn-cancel" onclick="hideConfirmDelete()">
+                Отмена
+            </button>
+            <button type="button" class="confirm-btn confirm-btn-delete" onclick="submitDelete()">
+                Удалить
+            </button>
+        </div>
+    </div>
+</div>
 
-            <!-- Удалить -->
-            <form th:action="@{/admin/clients/{id}/delete(id=${c.id})}"
-                  method="post"
-                  style="display:inline;"
-                  onsubmit="return confirm('Удалить заявку?');">
-                <button type="submit">Удалить</button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<!-- Индикатор загрузки -->
+<div id="loading" class="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Удаление заявки...</div>
+</div>
 
+<script th:src="@{/js/clients.js}"></script>
 </body>
 </html>

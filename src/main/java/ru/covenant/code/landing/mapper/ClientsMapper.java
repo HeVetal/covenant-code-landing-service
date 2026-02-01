@@ -15,8 +15,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ClientsMapper {
 
-    @Mapping(source = "email", target = "email")
-    @Mapping(source = "message", target = "message")
     @Mapping(constant = "NEW", target = "status")
     @Mapping(ignore = true, target = "id")
     @Mapping(ignore = true, target = "createdAt")
@@ -45,14 +43,22 @@ public interface ClientsMapper {
 
     ClientsStatusRqDto mapToClientsStatusRqDto(Clients clients);
 
+    // Исправленный метод для админки
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "phone", target = "phone")
+    @Mapping(source = "email", target = "email")
+    @Mapping(source = "message", target = "message")
+    @Mapping(source = "status", target = "status")
+    @Mapping(source = "createdAt", target = "createdAt")
     ClientsAdminRsDto mapToClientsAdminRsDto(Clients clients);
+
+    // Метод для списка
+    List<ClientsAdminRsDto> mapToClientsAdminRsDtoList(List<Clients> clients);
 
     ClientsDetailsRsDto mapToClientsDetailsRs(Clients clients);
 
-    /*@Mapping(source = "email",target = "email")
-    @Mapping(source = "message", target = "message")*/
     Clients mapToDetailsRsToClient(ClientsDetailsRsDto dto);
 
     ClientsDetailsRsDto mapToClientToDetailsRs(Clients entity);
-
 }

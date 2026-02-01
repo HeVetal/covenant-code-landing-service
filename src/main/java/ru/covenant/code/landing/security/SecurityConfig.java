@@ -31,11 +31,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
+                        // ПУБЛИЧНЫЕ маршруты (доступны всем)
                         .requestMatchers(
                                 "/",                              // Корневой путь
                                 "/index.html",                    // Главная страница
                                 "/v1/layout",                     // Лендинг
-                                "/v1/registerForm",               // Форма регистрации
+                                "/v1/registerForm",               // Форма заявки для клиентов
+                                "/v1/admin/register",             // Форма регистрации админов - ПУБЛИЧНАЯ!
                                 "/v1/login",                      // Страница входа
                                 "/v1/success",                    // Страница успеха
                                 "/styles.css",                    // CSS файлы
@@ -47,16 +49,19 @@ public class SecurityConfig {
                                 "/webjars/**",                    // WebJars
                                 "/h2-console/**"                  // H2 Console
                         ).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // ЗАКРЫТЫЕ маршруты (только для админов)
+                        .requestMatchers("/admin/**").hasRole("ADMIN")           // Вся админка - только для админов!
+
+                        // Все остальные маршруты требуют аутентификации
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers(
                                 "/h2-console/**",
-                                "/admin/clients/layout",
                                 "/v1/registerForm",
-                                "/v1/login",
-                                "/v1/layout"
+                                "/v1/admin/register",
+                                "/v1/login"
                         )
                 )
                 .headers(headers -> headers
@@ -79,9 +84,9 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .sessionManagement(session -> session
-                        .sessionFixation().migrateSession()        // Защита от фиксации сессии
-                        .maximumSessions(1)                        // Макс 1 сессия на пользователя
-                        .maxSessionsPreventsLogin(false)           // Разрешить новую сессию
+                        .sessionFixation().migrateSession()
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
                 )
                 .build();
     }
