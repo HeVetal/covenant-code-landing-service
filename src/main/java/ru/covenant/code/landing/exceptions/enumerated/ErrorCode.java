@@ -4,7 +4,8 @@ public enum ErrorCode {
     NOT_FOUND("Ошибка отсутствующего ресурса"),
     VALIDATION_ERROR("Ошибка валидации"),
     BUSINESS_ERROR("Ошибка бизнес-логики"),
-    COMMON_ERROR("Общая ошибка");
+    COMMON_ERROR("Общая ошибка"),
+    INTERNAL_ERROR("Произошла непредвиденная ошибка");
 
     private final String defaultMessage;
 
