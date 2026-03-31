@@ -41,7 +41,7 @@ class ClientsRepositoryTest {
         clientsRepository.flush();
 
         now = OffsetDateTime.now(ZoneOffset.UTC);
-        threeDaysAgo = now.minusDays(3);
+        threeDaysAgo = now.minusDays(3).minusNanos(1);
         twoDaysAgo = now.minusDays(2);
         oneDayAgo = now.minusDays(1);
         tomorrow = now.plusDays(1);

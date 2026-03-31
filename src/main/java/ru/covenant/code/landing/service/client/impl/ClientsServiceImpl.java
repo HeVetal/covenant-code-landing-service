@@ -1,5 +1,6 @@
 package ru.covenant.code.landing.service.client.impl;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +18,7 @@ import ru.covenant.code.landing.entity.enumerated.CourseType;
 import ru.covenant.code.landing.entity.enumerated.Priority;
 import ru.covenant.code.landing.entity.enumerated.Status;
 import ru.covenant.code.landing.dto.client.response.ClientsAdminRsDto;
-import ru.covenant.code.landing.exceptions.BusinessException;
-import ru.covenant.code.landing.exceptions.ClientDuplicateException;
-import ru.covenant.code.landing.exceptions.ExceptionFactory;
-import ru.covenant.code.landing.exceptions.ValidationException;
+import ru.covenant.code.landing.exceptions.*;
 
 import ru.covenant.code.landing.mapper.ClientsMapper;
 import ru.covenant.code.landing.repository.ClientsRepository;
@@ -41,7 +39,7 @@ public class ClientsServiceImpl implements ClientsService {
     private final ClientsRepository clientsRepository;
     private final ClientsSpecification clientsSpecification;
     private final ClientsMapper clientsMapper;
-    private final WebSocketPublisher publisher;
+//    private final WebSocketPublisher publisher;
     private final WebSocketPublisher webSocketPublisher;
     private final LoginStatsService loginStatsService;
 
@@ -136,10 +134,10 @@ public class ClientsServiceImpl implements ClientsService {
 
 
             try {
-                publisher.publishApplicationUpdated(response);
+                webSocketPublisher.publishApplicationUpdated(response);
 
                 ClientsStatsRsDto stats = getStats();
-                publisher.publishStatsUpdated(stats);
+                webSocketPublisher.publishStatsUpdated(stats);
 
                 log.debug("Отправлены WebSocket уведомления для клиента {}", id);
             } catch (Exception e) {
@@ -276,6 +274,33 @@ public class ClientsServiceImpl implements ClientsService {
         ClientsStatsRsDto clientsStats = clientsMapper.toClientsStats(loginStats); // Теперь работает!
         webSocketPublisher.publishStatsUpdated(clientsStats);
         return clientsMapper.toCreateResponse(savedClient);
+    }
+
+    @Override
+    @Transactional
+    public void delete(UUID id){
+        log.info("Удаление клиента с id: {}", id);
+
+        if (!clientsRepository.existsById(id)) {
+            log.warn("Попытка удаления несуществующего клиента с id: {}", id);
+            throw ExceptionFactory.clientNotFound(id);
+        }
+
+        try {
+            clientsRepository.deleteById(id);
+            clientsRepository.flush();
+
+            log.info("Клиент с id: {} успешно удален из базы данных", id);
+
+            webSocketPublisher.publishApplicationDeleted(id.toString());
+
+            ClientsStatsRsDto stats = getStats();
+            webSocketPublisher.publishStatsUpdated(stats);
+
+        } catch (DataAccessException e) {
+            log.error("Ошибка базы данных при удалении клиента с id: {}", id, e);
+            throw PersistenceException.delete("клиент", e);
+        }
     }
 
 }

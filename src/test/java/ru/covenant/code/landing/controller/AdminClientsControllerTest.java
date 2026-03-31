@@ -11,6 +11,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import ru.covenant.code.landing.dto.client.request.ClientsUpdateRqDto;
 
 import org.springframework.http.MediaType;
@@ -554,5 +556,74 @@ class AdminClientsControllerTest {
         controller.updateClient(testUpdateId, validUpdateDto);
 
         verify(clientsService, times(1)).updateClient(eq(testUpdateId), eq(validUpdateDto));
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – успешное удаление клиента")
+    void deleteClient_ShouldReturnSuccessResponse() {
+        UUID clientId = UUID.randomUUID();
+        doNothing().when(clientsService).delete(clientId);
+
+        ResponseEntity<ResponseWrapper<Void>> response = controller.deleteClient(clientId);
+
+        assertAll(
+                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+                () -> assertNotNull(response.getBody()),
+                () -> assertTrue(response.getBody().isSuccess()),
+                () -> assertNull(response.getBody().getResult()),
+                () -> assertNull(response.getBody().getError())
+        );
+        verify(clientsService, times(1)).delete(clientId);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – клиент не найден")
+    void deleteClient_WhenClientNotFound_ShouldThrowClientNotFoundException() {
+        UUID nonExistentId = UUID.randomUUID();
+        ClientNotFoundException expectedException = new ClientNotFoundException(nonExistentId);
+        doThrow(expectedException).when(clientsService).delete(nonExistentId);
+
+        ClientNotFoundException exception = assertThrows(
+                ClientNotFoundException.class,
+                () -> controller.deleteClient(nonExistentId)
+        );
+
+        assertAll(
+                () -> assertEquals("CLIENT_NOT_FOUND", exception.getErrorCode()),
+                () -> assertEquals(nonExistentId, exception.getClientId()),
+                () -> assertTrue(exception.getMessage().contains(nonExistentId.toString()))
+        );
+        verify(clientsService, times(1)).delete(nonExistentId);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – ошибка базы данных")
+    void deleteClient_WhenPersistenceError_ShouldThrowPersistenceException() {
+        UUID clientId = UUID.randomUUID();
+        PersistenceException expectedException = PersistenceException.delete("клиент", new RuntimeException("DB error"));
+        doThrow(expectedException).when(clientsService).delete(clientId);
+
+        PersistenceException exception = assertThrows(
+                PersistenceException.class,
+                () -> controller.deleteClient(clientId)
+        );
+
+        assertAll(
+                () -> assertEquals("PERSISTENCE_ERROR", exception.getErrorCode()),
+                () -> assertTrue(exception.getMessage().contains("удаление")),
+                () -> assertTrue(exception.getMessage().contains("клиент"))
+        );
+        verify(clientsService, times(1)).delete(clientId);
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – проверка вызова сервиса с правильным ID")
+    void deleteClient_ShouldCallServiceWithCorrectId() {
+        UUID clientId = UUID.randomUUID();
+        doNothing().when(clientsService).delete(clientId);
+
+        controller.deleteClient(clientId);
+
+        verify(clientsService, times(1)).delete(clientId);  // Проверяем, что вызван 1 раз с конкретным ID
     }
 }

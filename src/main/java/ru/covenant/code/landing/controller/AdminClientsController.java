@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.covenant.code.landing.dto.client.request.ClientsFilterRqDto;
@@ -66,68 +67,66 @@ public class AdminClientsController {
     }
 
 
-        @GetMapping("/status/{status}")
-        @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'SUPPORT')")
-        @Operation(
-                summary = "Получить клиентов по статусу",
-                description = "Возвращает список клиентов с указанным статусом"
-        )
-        @ApiResponses({
-                @ApiResponse(responseCode = "200", description = "Успешно получен список клиентов"),
-                @ApiResponse(responseCode = "400", description = "Некорректный статус"),
-                @ApiResponse(responseCode = "401", description = "Требуется аутентификация"),
-                @ApiResponse(responseCode = "403", description = "Недостаточно прав")
-        })
-        public ResponseWrapper<List<ClientsAdminRsDto>> getClientsByStatus(
-                @Parameter(
-                        description = "Статус клиента (NEW, PROCESSED, DONE)",
-                        example = "NEW",
-                        required = true,
-                        schema = @Schema(
-                                allowableValues = {"NEW", "PROCESSED", "DONE"},
-                                type = "string"
-                        )
-                )
-                @PathVariable String status) {
+    @GetMapping("/status/{status}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'SUPPORT')")
+    @Operation(
+            summary = "Получить клиентов по статусу",
+            description = "Возвращает список клиентов с указанным статусом"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Успешно получен список клиентов"),
+            @ApiResponse(responseCode = "400", description = "Некорректный статус"),
+            @ApiResponse(responseCode = "401", description = "Требуется аутентификация"),
+            @ApiResponse(responseCode = "403", description = "Недостаточно прав")
+    })
+    public ResponseWrapper<List<ClientsAdminRsDto>> getClientsByStatus(
+            @Parameter(
+                    description = "Статус клиента (NEW, PROCESSED, DONE)",
+                    example = "NEW",
+                    required = true,
+                    schema = @Schema(
+                            allowableValues = {"NEW", "PROCESSED", "DONE"},
+                            type = "string"
+                    )
+            )
+            @PathVariable String status) {
 
-            List<ClientsAdminRsDto> clients = clientsService.getClientsByStatus(status);
-            return ResponseWrapper.success(clients);
-        }
+        List<ClientsAdminRsDto> clients = clientsService.getClientsByStatus(status);
+        return ResponseWrapper.success(clients);
+    }
 
-        @PutMapping("/{id}")
-        @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'SUPPORT')")
-        @Operation(
-                summary = "Обновить данные клиента",
-                description = """
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR', 'SUPPORT')")
+    @Operation(
+            summary = "Обновить данные клиента",
+            description = """
                     Обновляет информацию о клиенте.
                     При указании processedBy автоматически устанавливается processedAt.
                     Null значения в запросе игнорируются.
                     
                     Доступно для ADMIN, MODERATOR, SUPPORT.
                     """
-        )
-        @ApiResponses(value = {
-                @ApiResponse(responseCode = "200", description = "Клиент успешно обновлен"),
-                @ApiResponse(responseCode = "400", description = "Неверные данные запроса"),
-                @ApiResponse(responseCode = "401", description = "Не авторизован"),
-                @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
-                @ApiResponse(responseCode = "404", description = "Клиент не найден"),
-                @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
-        })
-        public ResponseWrapper<ClientsAdminRsDto> updateClient (
-                @Parameter(
-                        description = "",
-                        required = true,
-                        example = "123e4567-e89b-12d3-a456-426614174000"
-                )
-                @PathVariable UUID id,
-                @Parameter(description = "Данные для обновления клиента")
-                @Valid @RequestBody ClientsUpdateRqDto updateDto)
-        {
-            ClientsAdminRsDto updatedClient = clientsService.updateClient(id, updateDto);
-            return ResponseWrapper.success(updatedClient);
-        }
-
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Клиент успешно обновлен"),
+            @ApiResponse(responseCode = "400", description = "Неверные данные запроса"),
+            @ApiResponse(responseCode = "401", description = "Не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещен"),
+            @ApiResponse(responseCode = "404", description = "Клиент не найден"),
+            @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
+    })
+    public ResponseWrapper<ClientsAdminRsDto> updateClient(
+            @Parameter(
+                    description = "",
+                    required = true,
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            )
+            @PathVariable UUID id,
+            @Parameter(description = "Данные для обновления клиента")
+            @Valid @RequestBody ClientsUpdateRqDto updateDto) {
+        ClientsAdminRsDto updatedClient = clientsService.updateClient(id, updateDto);
+        return ResponseWrapper.success(updatedClient);
+    }
 
 
     @GetMapping("/{id}")
@@ -298,5 +297,145 @@ public class AdminClientsController {
         log.info("REST Получение клиента по id: {}", id);
         ClientsAdminRsDto client = clientsService.getClientById(id);
         return ResponseWrapper.success(client);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
+    @Operation(summary = "Удалить клиента",
+            description = "Удаляет клиента из системы. Доступно только для ADMIN и MODERATOR")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Клиент успешно удален",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseWrapper.class),
+                            examples = @ExampleObject(
+                                    name = "successResponse",
+                                    summary = "Успешное удаление",
+                                    value = """
+                                            {
+                                                "success": true,
+                                                "result": null
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Отсутствует или неверный токен аутентификации",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseWrapper.class),
+                            examples = @ExampleObject(
+                                    name = "unauthorizedResponse",
+                                    summary = "Ошибка аутентификации",
+                                    value = """
+                                            {
+                                                "success": false,
+                                                "result": null,
+                                                "error": {
+                                                    "code": "UNAUTHORIZED",
+                                                    "description": "Требуется аутентификация",
+                                                    "message": "Отсутствует или недействителен токен авторизации",
+                                                    "details": null
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Недостаточно прав (роль SUPPORT или ниже)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseWrapper.class),
+                            examples = @ExampleObject(
+                                    name = "forbiddenResponse",
+                                    summary = "Ошибка доступа",
+                                    value = """
+                                            {
+                                                "success": false,
+                                                "result": null,
+                                                "error": {
+                                                    "code": "FORBIDDEN",
+                                                    "description": "Доступ запрещен",
+                                                    "message": "У вас нет прав для выполнения этой операции",
+                                                    "details": {
+                                                        "requiredRole": "ADMIN or MODERATOR",
+                                                        "userRole": "SUPPORT"
+                                                    }
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Клиент не найден",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseWrapper.class),
+                            examples = @ExampleObject(
+                                    name = "notFoundResponse",
+                                    summary = "Клиент не найден",
+                                    value = """
+                                            {
+                                                "success": false,
+                                                "result": null,
+                                                "error": {
+                                                    "code": "CLIENT_NOT_FOUND",
+                                                    "description": "Заявка не найдена",
+                                                    "message": "Заявка с ID {id} не найдена",
+                                                    "details": {
+                                                        "clientId": "{id}"
+                                                    }
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Внутренняя ошибка сервера",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ResponseWrapper.class),
+                            examples = @ExampleObject(
+                                    name = "internalErrorResponse",
+                                    summary = "Ошибка базы данных",
+                                    value = """
+                                            {
+                                                "success": false,
+                                                "result": null,
+                                                "error": {
+                                                    "code": "PERSISTENCE_ERROR",
+                                                    "description": "Ошибка сохранения данных",
+                                                    "message": "Ошибка при выполнении операции 'удаление' для сущности 'клиент'",
+                                                    "details": {
+                                                        "entityName": "клиент",
+                                                        "operation": "удаление"
+                                                    }
+                                                }
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<ResponseWrapper<Void>> deleteClient(
+            @Parameter(
+                    description = "Уникальный идентификатор клиента для удаления",
+                    required = true,
+                    example = "123e4567-e89b-12d3-a456-426614174000"
+            )
+            @PathVariable UUID id) {
+        log.info("REST Запрос на удаление клиента с id: {}", id);
+        clientsService.delete(id);
+        return ResponseEntity.ok(ResponseWrapper.success());
     }
 }

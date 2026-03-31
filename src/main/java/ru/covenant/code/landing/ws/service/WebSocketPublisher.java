@@ -65,6 +65,8 @@ public class WebSocketPublisher {
             log.info("Публикация обновления статистики заявок");
 
             var message = new WebSocketMessageDto("STATS_UPDATED", stats);
+            message.setType("STATS_UPDATED");
+            message.setStats(stats);
 
             simpMessagingTemplate.convertAndSend("/topic/applications", message);
 
@@ -79,6 +81,8 @@ public class WebSocketPublisher {
             log.info("Публикация обновления статистики логинов");
 
             var message = new WebSocketMessageDto("LOGIN_STATS_UPDATED", stats);
+            message.setType("LOGIN_STATS_UPDATED");
+            message.setStats(stats);
 
             simpMessagingTemplate.convertAndSend("/topic/login-stats", message);
 

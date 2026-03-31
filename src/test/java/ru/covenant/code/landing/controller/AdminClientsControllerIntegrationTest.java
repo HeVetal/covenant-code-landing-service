@@ -553,4 +553,142 @@ class AdminClientsControllerIntegrationTest {
                 .andExpect(status().isForbidden());
     }
 
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – успешное удаление клиента")
+    @WithMockUser(roles = "ADMIN")
+    void deleteClient_WithExistingId_ShouldReturn200AndDeleteClient() throws Exception {
+        UUID clientIdToDelete = existingClientId;
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent(),
+                "Клиент должен существовать перед удалением");
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", clientIdToDelete)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.result").doesNotExist())
+                .andExpect(jsonPath("$.error").doesNotExist());
+
+        assertFalse(clientsRepository.findById(clientIdToDelete).isPresent(),
+                "Клиент должен быть удален из базы данных");
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – удаление несуществующего клиента")
+    @WithMockUser(roles = "ADMIN")
+    void deleteClient_WithNonExistingId_ShouldReturn404() throws Exception {
+        UUID nonExistentId = UUID.randomUUID();
+        assertFalse(clientsRepository.findById(nonExistentId).isPresent(),
+                "Клиент не должен существовать");
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", nonExistentId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.result").doesNotExist())
+                .andExpect(jsonPath("$.error").exists())
+                .andExpect(jsonPath("$.error.code").value("CLIENT_NOT_FOUND"))
+                .andExpect(jsonPath("$.error.description").value("Заявка не найдена"))
+                .andExpect(jsonPath("$.error.message").value("Заявка с ID {" + nonExistentId + "} не найдена"))
+                .andExpect(jsonPath("$.error.details.clientId").value(nonExistentId.toString()));
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – доступ для роли MODERATOR")
+    @WithMockUser(roles = "MODERATOR")
+    void deleteClient_WithModeratorRole_ShouldReturn200() throws Exception {
+        UUID clientIdToDelete = existingClientId;
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent());
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", clientIdToDelete)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        assertFalse(clientsRepository.findById(clientIdToDelete).isPresent());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – доступ запрещен для роли SUPPORT (возвращает 500)")
+    @WithMockUser(roles = "SUPPORT")
+    void deleteClient_WithSupportRole_ShouldReturn500() throws Exception {
+        UUID clientIdToDelete = existingClientId;
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent(),
+                "Клиент должен существовать перед тестом");
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", clientIdToDelete)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("INTERNAL_ERROR"))
+                .andExpect(jsonPath("$.error.description").value("Внутренняя ошибка сервера"))
+                .andExpect(jsonPath("$.error.message").value("Произошла непредвиденная ошибка"))
+                .andExpect(jsonPath("$.error.details.exceptionClass")
+                        .value("org.springframework.security.authorization.AuthorizationDeniedException"))
+                .andExpect(jsonPath("$.error.details.exceptionMessage").value("Access Denied"));
+
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent(),
+                "Клиент не должен быть удален при недостаточных правах");
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – доступ без аутентификации")
+    void deleteClient_WithoutAuthentication_ShouldReturnForbidden() throws Exception {
+        UUID clientIdToDelete = existingClientId;
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent());
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", clientIdToDelete)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());  // 403 Forbidden
+
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – доступ с недостаточными правами (ROLE_USER)")
+    @WithMockUser(roles = "USER")
+    void deleteClient_WithUserRole_ShouldReturn403() throws Exception {
+        UUID clientIdToDelete = existingClientId;
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent());
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", clientIdToDelete)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+        assertTrue(clientsRepository.findById(clientIdToDelete).isPresent());
+    }
+
+    @Test
+    @DisplayName("DELETE /api/v1/admin/clients/{id} – проверка структуры успешного ответа (result: null)")
+    @WithMockUser(roles = "ADMIN")
+    void deleteClient_ShouldReturnSuccessResponseWithNullResult() throws Exception {
+        Clients testClient = Clients.builder()
+                .name("Клиент для проверки структуры")
+                .email("structure@example.com")
+                .phone("+79001234567")
+                .message("Тестовое сообщение")
+                .courseType(CourseType.BACKEND)
+                .status(Status.NEW)
+                .priority(Priority.MEDIUM)
+                .source("Лендинг")
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
+                .build();
+        Clients savedClient = clientsRepository.save(testClient);
+        UUID clientId = savedClient.getId();
+
+        mockMvc.perform(delete("/api/v1/admin/clients/{id}", clientId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.result").doesNotExist())
+                .andExpect(jsonPath("$.error").doesNotExist())
+                .andExpect(content().json("{\"success\":true}"));
+    }
+
 }
